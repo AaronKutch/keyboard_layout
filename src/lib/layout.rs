@@ -37,28 +37,40 @@ impl<T: Display> Display for Layout<T> {
     }
 }
 
-pub fn middle_column(i: usize) -> bool {
+pub fn middle_column(i: u8) -> bool {
     matches!(i, 5 | 6 | 17 | 18 | 29 | 30)
 }
 
-pub fn index_column(i: usize) -> bool {
+pub fn index_column(i: u8) -> bool {
     matches!(i, 4 | 7 | 16 | 19 | 28 | 29)
 }
 
-pub fn ext_pinky(i: usize) -> bool {
+pub fn ext_pinky(i: u8) -> bool {
     matches!(i, 0 | 11 | 12 | 23 | 24 | 35)
 }
 
-pub fn left_side(i: usize) -> bool {
+pub fn left_side(i: u8) -> bool {
     matches!(i, 0..=5 | 12..=17 | 24..=35)
 }
 
-pub fn middle_row(i: usize) -> bool {
+pub fn middle_row(i: u8) -> bool {
     matches!(i, 12..=23)
 }
 
+pub fn upper_row(i: u8) -> bool {
+    matches!(i, 0..=11)
+}
+
+pub fn lower_row(i: u8) -> bool {
+    matches!(i, 24..=35)
+}
+
+pub fn column(i: u8) -> u8 {
+    i % 12
+}
+
 /// Base cost of pressing a key
-pub fn base_cost(i: usize) -> u64 {
+pub fn base_cost(i: u8) -> u64 {
     match i {
         // 8 main keys
         13..=16 | 19..=22 => 100,
@@ -75,17 +87,33 @@ pub fn base_cost(i: usize) -> u64 {
     }
 }
 
-/// A record of up to the last 10 keys, with the zeroeth being the most recent
+/// A record of up to the last few keys, with the zeroeth being the most recent
 /// press
-pub fn movement_cost(x: &[usize]) -> u64 {
+pub fn movement_cost(x: &[u8]) -> u64 {
     let mut c = 0;
     if x.len() > 1 {
-        if left_side(x[0]) != left_side(x[1]) {
+        if left_side(x[0]) == left_side(x[1]) {
             // same side
 
             // mid to upper or lower row changes on same side
             if !middle_row(x[0]) && middle_row(x[1]) {
                 c += 100;
+            }
+
+            // these kinds of changes are always ugly
+            if (upper_row(x[0]) && lower_row(x[1])) || (lower_row(x[0]) && upper_row(x[1])) {
+                c += 200;
+            }
+
+            // penalize rolling outwards a little
+            if left_side(x[0]) {
+                if column(x[0]) > column(x[1]) {
+                    c += 30;
+                }
+            } else {
+                if column(x[0]) < column(x[1]) {
+                    c += 30;
+                }
             }
         }
 
@@ -95,14 +123,14 @@ pub fn movement_cost(x: &[usize]) -> u64 {
             c += 400;
         }
     }
-    if x.len() > 2 {}
+    //if x.len() > 2 {}
     c
 }
 
 impl<T> Layout<T> {
-    pub fn new<F: FnMut(usize) -> T>(f: F) -> Self {
+    pub fn new<F: FnMut(u8) -> T>(mut f: F) -> Self {
         Self {
-            keys: array::from_fn(f),
+            keys: array::from_fn(|i| f(i as u8)),
         }
     }
 }
