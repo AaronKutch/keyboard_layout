@@ -19,7 +19,7 @@ impl<T: Display> Display for Layout<T> {
             writeln!(
                 f,
                 "{} {} {} {} {} {}   {} {} {} {} {} {}",
-                x[i + 0],
+                x[i],
                 x[i + 1],
                 x[i + 2],
                 x[i + 3],
@@ -37,27 +37,72 @@ impl<T: Display> Display for Layout<T> {
     }
 }
 
+pub fn middle_column(i: usize) -> bool {
+    matches!(i, 5 | 6 | 17 | 18 | 29 | 30)
+}
+
+pub fn index_column(i: usize) -> bool {
+    matches!(i, 4 | 7 | 16 | 19 | 28 | 29)
+}
+
+pub fn ext_pinky(i: usize) -> bool {
+    matches!(i, 0 | 11 | 12 | 23 | 24 | 35)
+}
+
+pub fn left_side(i: usize) -> bool {
+    matches!(i, 0..=5 | 12..=17 | 24..=35)
+}
+
+pub fn middle_row(i: usize) -> bool {
+    matches!(i, 12..=23)
+}
+
+/// Base cost of pressing a key
+pub fn base_cost(i: usize) -> u64 {
+    match i {
+        // 8 main keys
+        13..=16 | 19..=22 => 100,
+        // two below index finger
+        28 | 31 => 150,
+        // other keys in index and middle orthogonal neighborhood
+        3 | 4 | 7 | 8 | 17 | 18 | 27 | 32 => 200,
+        // other orthogonal keys in main group
+        1 | 2 | 9 | 10 | 25 | 26 | 33 | 34 => 250,
+        // diagonal to index
+        5 | 6 | 29 | 30 => 300,
+        // pinky extension
+        _ => 400,
+    }
+}
+
+/// A record of up to the last 10 keys, with the zeroeth being the most recent
+/// press
+pub fn movement_cost(x: &[usize]) -> u64 {
+    let mut c = 0;
+    if x.len() > 1 {
+        if left_side(x[0]) != left_side(x[1]) {
+            // same side
+
+            // mid to upper or lower row changes on same side
+            if !middle_row(x[0]) && middle_row(x[1]) {
+                c += 100;
+            }
+        }
+
+        // a key in the index or middle column was pressed and then a far pinky is
+        // pressed, heavily penalize
+        if (index_column(x[1]) || middle_column(x[1])) && ext_pinky(x[0]) {
+            c += 400;
+        }
+    }
+    if x.len() > 2 {}
+    c
+}
+
 impl<T> Layout<T> {
     pub fn new<F: FnMut(usize) -> T>(f: F) -> Self {
         Self {
             keys: array::from_fn(f),
-        }
-    }
-
-    pub fn base_cost(i: usize) -> u64 {
-        match i {
-            // 8 main keys
-            13..=16 | 19..=22 => 100,
-            // two below index finger
-            28 | 31 => 150,
-            // other keys in index and middle orthogonal neighborhood
-            3 | 4 | 7 | 8 | 17 | 18 | 27 | 32 => 200,
-            // other orthogonal keys in main group
-            1 | 2 | 9 | 10 | 25 | 26 | 33 | 34 => 250,
-            // diagonal to index
-            5 | 6 | 29 | 30 => 300,
-            // pinky extension
-            _ => 400,
         }
     }
 }

@@ -5,7 +5,7 @@ use triple_arena::{ptr_struct, OrdArena};
 ptr_struct!(P0);
 
 fn main() {
-    let stats = fs::read_to_string(&PathBuf::from("./stats.txt".to_owned())).unwrap();
+    let stats = fs::read_to_string(PathBuf::from("./stats.txt".to_owned())).unwrap();
     let mut stats = stats.as_bytes().to_owned();
     common::remove_other_layer_keys(&mut stats);
     let mut ord: OrdArena<P0, u8, u64> = OrdArena::new();
