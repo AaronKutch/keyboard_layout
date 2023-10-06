@@ -1,5 +1,6 @@
 mod layout;
 
+pub use layout::*;
 use rand_xoshiro::{rand_core::RngCore, Xoshiro128StarStar};
 
 pub fn intersperse(rng: &mut Xoshiro128StarStar, s: &mut Vec<u8>, c: u8) {
