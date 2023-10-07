@@ -12,3 +12,5 @@ path = "./src/lib/common.rs"
 walkdir = "2"
 triple_arena = "0.12"
 rand_xoshiro = { version = "0.6", default-features = false }
+smallvec = "1.11"
+awint = "0.13"

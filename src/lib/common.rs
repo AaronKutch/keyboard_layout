@@ -1,11 +1,15 @@
+mod anneal_ramp;
 mod layout;
+mod rng;
 
 use std::fmt::Display;
 
+pub use anneal_ramp::*;
 pub use layout::*;
 use rand_xoshiro::{rand_core::RngCore, Xoshiro128StarStar};
+pub use rng::*;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DispChar(pub u8);
 
 impl Display for DispChar {
