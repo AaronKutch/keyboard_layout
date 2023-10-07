@@ -39,6 +39,5 @@ fn main() {
             space_count = 0;
         }
     }
-    // randomly intersperse backspaces
-    fs::write(PathBuf::from("./stats.txt".to_owned()), all1).unwrap();
+    fs::write(PathBuf::from("./text.txt".to_owned()), all1).unwrap();
 }

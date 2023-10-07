@@ -5,11 +5,11 @@ use triple_arena::{ptr_struct, OrdArena};
 ptr_struct!(P0);
 
 fn main() {
-    let stats = fs::read_to_string(PathBuf::from("./stats.txt".to_owned())).unwrap();
-    let mut stats = stats.as_bytes().to_owned();
-    common::remove_other_layer_keys(&mut stats);
+    let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
+    let mut text = text.as_bytes().to_owned();
+    common::remove_other_layer_keys(&mut text);
     let mut ord: OrdArena<P0, u8, u64> = OrdArena::new();
-    for c in stats {
+    for c in text {
         if let Some(p) = ord.find_key(&c) {
             *ord.get_val_mut(p).unwrap() += 1;
         } else {
