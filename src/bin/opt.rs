@@ -1,12 +1,12 @@
 use std::{fs, path::PathBuf};
 
 use common::{
-    base_cost, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout, RampOptimize,
-    StarRng,
+    base_cost, char_to_byte, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout,
+    RampOptimize, StarRng,
 };
 
 fn main() {
-    let population = 1000;
+    let population = 1024;
     let sample_len: u64 = 1024;
 
     let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
@@ -15,6 +15,21 @@ fn main() {
     let rng_seed = 0;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
+
+    // freeze backspace and space at keys 18 and 19
+    opt.frozen.keys[18] = true;
+    opt.frozen.keys[19] = true;
+    for layout in &mut opt.beam {
+        let layout = &mut layout.1;
+        for i in 0..layout.keys.len() {
+            if layout.keys[i].0 == char_to_byte('\u{8}').unwrap() {
+                layout.keys.swap(i, 18);
+            }
+            if layout.keys[i].0 == char_to_byte(' ').unwrap() {
+                layout.keys.swap(i, 19);
+            }
+        }
+    }
 
     let mut cost_fn = |num_samples: usize, layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
@@ -44,8 +59,8 @@ fn main() {
         cost
     };
 
-    for step in 0..64 {
-        let num_samples = 1 + (step / 8);
+    for step in 0..240 {
+        let num_samples = 1 + (step / 80);
         opt.step(|layout| cost_fn(num_samples, layout));
         //dbg!(opt.beam[0].0);
         let mut find_best = vec![];
@@ -89,4 +104,9 @@ v3:
 k u . f p /   , N r c d m
 q l a e s i   : B S t T y
 j b _ g n w   z o ; h v x
+
+v4:
+z w v m f /   k u d o _ y
+x a t r s N   B S T e i h
+j ; , c l .   g n p b : q
 */

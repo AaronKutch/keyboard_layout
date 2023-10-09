@@ -6,6 +6,7 @@ use crate::{DispChar, Layout, StarRng};
 
 pub struct RampOptimize {
     rng: StarRng,
+    pub frozen: Layout<bool>,
     pub beam: Vec<(u64, Layout<DispChar>)>,
 }
 
@@ -29,6 +30,7 @@ impl RampOptimize {
         } else {
             let mut res = Self {
                 rng: StarRng::new(rng_seed),
+                frozen: Layout::new(|_| false),
                 beam: vec![],
             };
             for i in 0..population {
@@ -62,10 +64,17 @@ impl RampOptimize {
                     .1
                     .clone();
                 // probably no reason to swap more than 8 at a time
-                let num = (self.rng.next_u8() % 7) + 2;
+                let num = (self.rng.next_u8() % 2) + 2;
                 inxs_to_move.clear();
                 for _ in 0..num {
-                    inxs_to_move.push(self.rng.next_u8() % num_keys);
+                    // TODO this is inefficient
+                    loop {
+                        let inx = self.rng.next_u8() % num_keys;
+                        if !self.frozen.keys[usize::from(inx)] {
+                            inxs_to_move.push(inx);
+                            break
+                        }
+                    }
                 }
                 // `inxs_to_move` is already scrambled, move in chain
                 for i in 1..usize::from(num) {
