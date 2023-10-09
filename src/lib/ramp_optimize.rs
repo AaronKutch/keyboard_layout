@@ -40,6 +40,18 @@ impl RampOptimize {
         }
     }
 
+    pub fn freeze_key(&mut self, key: char, inx: usize) {
+        self.frozen.keys[inx] = true;
+        for layout in &mut self.beam {
+            let layout = &mut layout.1;
+            for i in 0..layout.keys.len() {
+                if layout.keys[i].0 == crate::char_to_byte(key).unwrap() {
+                    layout.keys.swap(i, inx);
+                }
+            }
+        }
+    }
+
     pub fn step<F: FnMut(&Layout<DispChar>) -> u64>(&mut self, mut cost_fn: F) {
         let mut inxs_to_move = SmallVec::<[u8; 8]>::new();
         let num_keys = u8::try_from(self.beam[0].1.keys.len()).unwrap();

@@ -1,8 +1,8 @@
 use std::{fs, path::PathBuf};
 
 use common::{
-    base_cost, char_to_byte, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout,
-    RampOptimize, StarRng,
+    base_cost, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout, RampOptimize,
+    StarRng,
 };
 
 fn main() {
@@ -16,38 +16,14 @@ fn main() {
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
+    opt.freeze_key('\t', 0);
     // freeze backspace and space at keys 18 and 19
-    opt.frozen.keys[18] = true;
-    opt.frozen.keys[19] = true;
     // freeze tab, r, s, \n
-    opt.frozen.keys[0] = true;
-    opt.frozen.keys[15] = true;
-    opt.frozen.keys[16] = true;
-    opt.frozen.keys[17] = true;
-
-    for layout in &mut opt.beam {
-        let layout = &mut layout.1;
-        for i in 0..layout.keys.len() {
-            if layout.keys[i].0 == char_to_byte('\u{8}').unwrap() {
-                layout.keys.swap(i, 18);
-            }
-            if layout.keys[i].0 == char_to_byte(' ').unwrap() {
-                layout.keys.swap(i, 19);
-            }
-            if layout.keys[i].0 == char_to_byte('\t').unwrap() {
-                layout.keys.swap(i, 0);
-            }
-            if layout.keys[i].0 == char_to_byte('r').unwrap() {
-                layout.keys.swap(i, 15);
-            }
-            if layout.keys[i].0 == char_to_byte('s').unwrap() {
-                layout.keys.swap(i, 16);
-            }
-            if layout.keys[i].0 == char_to_byte('\n').unwrap() {
-                layout.keys.swap(i, 17);
-            }
-        }
-    }
+    //opt.freeze_key('\u{8}', 18);
+    //opt.freeze_key(' ', 19);
+    //opt.freeze_key('r', 15);
+    //opt.freeze_key('s', 16);
+    //opt.freeze_key('\n', 17);
 
     let mut cost_fn = |num_samples: usize, layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
@@ -159,6 +135,9 @@ v5 also features `;` and `_` in potentially ideal places
 
 // j, z, w, q might go in special enabled zone
 
-// TODO actually fix tab
+v6:
+T , N h : ;   b y p _ d j
+g B n s t u   o r e a S x
+q z w f i k   . l m c / v
 
 */

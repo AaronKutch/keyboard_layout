@@ -125,17 +125,6 @@ pub fn movement_cost(x: &[u8]) -> u64 {
     c
 }
 
-/// The costs associated with a sequence of two key presses
-pub fn cost_matrix() -> [[u64; 36]; 36] {
-    let mut res = [[0; 36]; 36];
-    for x1 in 0..36u8 {
-        for x0 in 0..36u8 {
-            res[usize::from(x1)][usize::from(x0)] = movement_cost(&[x0, x1]);
-        }
-    }
-    res
-}
-
 impl<T> Layout<T> {
     pub fn new<F: FnMut(u8) -> T>(mut f: F) -> Self {
         Self {
