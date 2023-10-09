@@ -4,12 +4,12 @@ use smallvec::SmallVec;
 
 use crate::{DispChar, Layout, StarRng};
 
-pub struct AnnealRamp {
+pub struct RampOptimize {
     rng: StarRng,
     pub beam: Vec<(u64, Layout<DispChar>)>,
 }
 
-impl Debug for AnnealRamp {
+impl Debug for RampOptimize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for (cost, layout) in &self.beam {
             write!(f, "{}\n{}", cost, layout)?;
@@ -18,7 +18,7 @@ impl Debug for AnnealRamp {
     }
 }
 
-impl AnnealRamp {
+impl RampOptimize {
     pub fn new<F: FnMut(usize) -> Layout<DispChar>>(
         rng_seed: u64,
         population: usize,

@@ -110,10 +110,8 @@ pub fn movement_cost(x: &[u8]) -> u64 {
                 if column(x[0]) > column(x[1]) {
                     c += 30;
                 }
-            } else {
-                if column(x[0]) < column(x[1]) {
-                    c += 30;
-                }
+            } else if column(x[0]) < column(x[1]) {
+                c += 30;
             }
         }
 

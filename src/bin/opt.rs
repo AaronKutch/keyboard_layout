@@ -1,8 +1,8 @@
 use std::{fs, path::PathBuf};
 
 use common::{
-    base_cost, colemak_dh_reference, movement_cost, qwerty_reference, rand_layout, AnnealRamp,
-    DispChar, Layout, StarRng,
+    base_cost, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout, RampOptimize,
+    StarRng,
 };
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
 
     let rng_seed = 0;
     let mut rng = StarRng::new(rng_seed);
-    let mut anneal = AnnealRamp::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
+    let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
     let mut cost_fn = |layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
@@ -42,11 +42,11 @@ fn main() {
         cost
     };
 
-    for step in 0..100 {
-        anneal.step(&mut cost_fn);
-        //dbg!(anneal.beam[0].0);
+    for _ in 0..100 {
+        opt.step(&mut cost_fn);
+        //dbg!(opt.beam[0].0);
         let mut find_best = vec![];
-        for (_, layout) in anneal.beam.iter().take(32) {
+        for (_, layout) in opt.beam.iter().take(32) {
             let mut cost = 0;
             for _ in 0..32 {
                 cost += cost_fn(layout);
@@ -58,7 +58,7 @@ fn main() {
     }
 
     let mut find_best = vec![];
-    for (_, layout) in anneal.beam.iter().take(32) {
+    for (_, layout) in opt.beam.iter().take(32) {
         let mut cost = 0;
         for _ in 0..32 {
             cost += cost_fn(layout);
@@ -68,7 +68,7 @@ fn main() {
     find_best.sort();
     dbg!(find_best[0].0);
 
-    println!("annealed:\n{}", find_best[0].1);
+    println!("opted:\n{}", find_best[0].1);
     println!("colemak:\n{}", colemak_dh_reference());
 }
 
@@ -78,7 +78,7 @@ T q w f p b   j l u y ; _
 E a r s t g   m n e i o N
 : x c d v z   k h , . / S
 
-annealed:
+ramp optimization:
 : . h b y ,   w n N o m k
 q a T s i u   E S r p t j
 / f l c B d   g e _ ; v x

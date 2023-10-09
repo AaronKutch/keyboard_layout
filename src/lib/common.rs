@@ -1,11 +1,11 @@
-mod anneal_ramp;
 mod layout;
+mod ramp_optimize;
 mod rng;
 
 use std::fmt::Display;
 
-pub use anneal_ramp::*;
 pub use layout::*;
+pub use ramp_optimize::*;
 use rand_xoshiro::{rand_core::RngCore, Xoshiro128StarStar};
 pub use rng::*;
 
