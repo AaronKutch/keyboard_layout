@@ -95,12 +95,11 @@ pub fn lowercase_alpha_chars() -> Vec<char> {
 pub fn primary_layer_chars() -> Vec<char> {
     let mut v = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', ' ', '\u{8}', '\t', '\n', ':', '/', '.', ',',
-        ';',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', ' ', '\u{8}', '\t', '\n', '/', '.', ',', ';',
     ]
     .to_vec();
     v.sort();
-    assert_eq!(v.len(), 36);
+    assert_eq!(v.len(), 35);
     v
 }
 

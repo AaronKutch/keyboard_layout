@@ -9,19 +9,23 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 2;
+    let rng_seed = 10;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-    opt.freeze_key('\t', 0);
-    // freeze backspace and space at keys 18 and 19
-    // freeze tab, r, s, \n
+    /*opt.freeze_key('\t', 0);
+    opt.freeze_key('\u{8}', 18);
+    opt.freeze_key(' ', 19);
+    opt.freeze_key('_', 31);
+    opt.freeze_key('r', 15);
+    opt.freeze_key('s', 16);
+    opt.freeze_key(';', 30);*/
+
     //opt.freeze_key('\u{8}', 18);
     //opt.freeze_key(' ', 19);
-    //opt.freeze_key('r', 15);
-    //opt.freeze_key('s', 16);
     //opt.freeze_key('\n', 17);
 
+    // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
         for (i, c) in layout.keys.iter().enumerate() {
@@ -44,7 +48,7 @@ fn main() {
         cost
     };
 
-    let num_steps = 200;
+    let num_steps = 240;
     for step in 0..num_steps {
         if (step % 20) == 0 {
             dbg!(step);
@@ -53,7 +57,7 @@ fn main() {
             // on the last iteration get the best cases
             32
         } else {
-            1 + (step / 50)
+            1 + (step / 20)
         };
         let mut sample_starts = vec![];
         for _ in 0..num_samples {
@@ -97,7 +101,6 @@ fn main() {
         find_best.push((cost, layout.to_owned()));
     }
     find_best.sort();
-    dbg!(find_best[0].0);
     let best = find_best[0].1.clone();
 
     /*for i in 0..36 {
@@ -160,7 +163,13 @@ v5 also features `;` and `_` in potentially ideal places
 
 keep tab in upper corner
 
-map newline or `_` as shift + space
+map newline or `_` or tab as shift + space?
 map delete as shift + backspace
+
+commiting to making `:` from shift + `;`
+
+T / g m p b   . o N y u Z
+j n t r s h   B S i a e x
+q , v c l k   ; _ f w d z
 
 */
