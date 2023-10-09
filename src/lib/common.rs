@@ -81,11 +81,13 @@ pub fn delim_layer_chars() -> Vec<char> {
     v
 }
 
-// dual layer (arrow keys are shown with "v < ^ >")
+// dual layer (arrow keys are shown in "v < ^ >")
 /*
-             7 8 9
- v < ^ >   0 4 5 6
-             1 2 3
+
+  @ # ? ! % 0 7 8 9 0
+  v < ^ > = 0 4 5 6 0
+^ / * - + $ 0 1 2 3 0
+
 */
 
 pub fn qwerty_reference() -> Layout<DispChar> {
