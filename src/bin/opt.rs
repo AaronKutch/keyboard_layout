@@ -16,53 +16,55 @@ fn main() {
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-    let mut cost_fn = |layout: &Layout<DispChar>| {
+    let mut cost_fn = |num_samples: usize, layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
         for (i, c) in layout.keys.iter().enumerate() {
             char_to_layout_inx[c.0 as usize] = DispChar(i as u8);
         }
 
-        let len = text.len();
-        let sample_inx = usize::try_from(
-            rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
-        )
-        .unwrap();
         let mut cost = 0;
-        for i in 0..usize::try_from(sample_len).unwrap() {
-            let j = i + sample_inx;
-            let c0 = text[j];
-            let inx0 = char_to_layout_inx[usize::from(c0)];
-            cost += base_cost(inx0.0);
-            if i > 0 {
-                let c1 = text[j - 1];
-                let inx1 = char_to_layout_inx[usize::from(c1)];
-                cost += movement_cost(&[inx0.0, inx1.0]);
+        for _ in 0..num_samples {
+            let len = text.len();
+            let sample_inx = usize::try_from(
+                rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
+            )
+            .unwrap();
+            for i in 0..usize::try_from(sample_len).unwrap() {
+                let j = i + sample_inx;
+                let c0 = text[j];
+                let inx0 = char_to_layout_inx[usize::from(c0)];
+                cost += base_cost(inx0.0);
+                if i > 0 {
+                    let c1 = text[j - 1];
+                    let inx1 = char_to_layout_inx[usize::from(c1)];
+                    cost += movement_cost(&[inx0.0, inx1.0]);
+                }
             }
         }
         cost
     };
 
-    for _ in 0..100 {
-        opt.step(&mut cost_fn);
+    for step in 0..64 {
+        let num_samples = 1 + (step / 8);
+        opt.step(|layout| cost_fn(num_samples, layout));
         //dbg!(opt.beam[0].0);
         let mut find_best = vec![];
         for (_, layout) in opt.beam.iter().take(32) {
-            let mut cost = 0;
-            for _ in 0..32 {
-                cost += cost_fn(layout);
-            }
+            let cost = cost_fn(32, layout);
             find_best.push((cost, layout.to_owned()));
         }
         find_best.sort();
-        dbg!(find_best[0].0);
+        println!("{} {}", step, find_best[0].0);
+        /*if step % 20 == 0 {
+            for i in 0..32 {
+                println!("{}\n{}", find_best[i].0, find_best[i].1);
+            }
+        }*/
     }
 
     let mut find_best = vec![];
     for (_, layout) in opt.beam.iter().take(32) {
-        let mut cost = 0;
-        for _ in 0..32 {
-            cost += cost_fn(layout);
-        }
+        let cost = cost_fn(32, layout);
         find_best.push((cost, layout.to_owned()));
     }
     find_best.sort();
@@ -78,8 +80,13 @@ T q w f p b   j l u y ; _
 E a r s t g   m n e i o N
 : x c d v z   k h , . / S
 
-ramp optimization:
+v2:
 : . h b y ,   w n N o m k
 q a T s i u   E S r p t j
 / f l c B d   g e _ ; v x
+
+v3:
+k u . f p /   , N r c d m
+q l a e s i   : B S t T y
+j b _ g n w   z o ; h v x
 */
