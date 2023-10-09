@@ -5,7 +5,7 @@ use common::{base_cost, colemak_dh_reference, movement_cost};
 fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let mut text = text.as_bytes().to_owned();
-    common::remove_other_layer_keys(&mut text);
+    //common::remove_other_layer_keys(&mut text);
 
     let mut char_to_layout_inx: [Option<u8>; 256] = [None; 256];
 

@@ -18,6 +18,17 @@ impl Display for DispChar {
     }
 }
 
+pub fn char_to_byte(c: char) -> Option<u8> {
+    // as_ascii isn't stable yet
+    let mut s = String::new();
+    s.push(c);
+    if !s.is_ascii() {
+        None
+    } else {
+        Some(s.as_bytes()[0])
+    }
+}
+
 pub fn intersperse(rng: &mut Xoshiro128StarStar, s: &mut Vec<u8>, c: u8) {
     if s.is_empty() {
         return
@@ -54,10 +65,19 @@ pub fn lowercase_ordinary_chars() -> Vec<char> {
     v
 }
 
+pub fn lowercase_alpha_chars() -> Vec<char> {
+    [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    ]
+    .to_vec()
+}
+
 pub fn primary_layer_chars() -> Vec<char> {
     let mut v = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '\u{8}', '\n', ':', '/', '.', ',', ';',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', ' ', '\u{8}', '\u{1b}', '\t', '\n', ':', '/',
+        '.', ',', ';',
     ]
     .to_vec();
     v.sort();
@@ -68,7 +88,7 @@ pub fn primary_layer_chars() -> Vec<char> {
 
 // layout should probably be
 /*
-  ~ ` '    "
+  ~ ` '    " & ^
 < > ( )    [ ] { }
       \    |
 */
@@ -89,6 +109,22 @@ pub fn delim_layer_chars() -> Vec<char> {
 ^ / * - + $ 0 1 2 3 0
 
 */
+
+// maps all bytes to the primary layer chars, also lowercasing alphabetical
+// chars
+pub fn std_primary_map() -> [u8; 256] {
+    let mut char_map: [u8; 256] = [0; 256];
+    for c in primary_layer_chars() {
+        let c = char_to_byte(c).unwrap();
+        char_map[usize::from(c)] = c;
+    }
+    for c in lowercase_alpha_chars() {
+        let c_lo = char_to_byte(c).unwrap();
+        let c_hi = char_to_byte(c.to_ascii_uppercase()).unwrap();
+        char_map[usize::from(c_hi)] = c_lo;
+    }
+    char_map
+}
 
 pub fn qwerty_reference() -> Layout<DispChar> {
     let mut res = Layout {
