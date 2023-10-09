@@ -1,27 +1,28 @@
 use std::{fs, path::PathBuf};
 
-use triple_arena::{ptr_struct, OrdArena};
-
-ptr_struct!(P0);
+const FILE: &str = "./text.txt";
 
 fn main() {
-    let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
-    let mut text = text.as_bytes().to_owned();
-    common::remove_other_layer_keys(&mut text);
-    let mut ord: OrdArena<P0, u8, u64> = OrdArena::new();
-    for c in text {
-        if let Some(p) = ord.find_key(&c) {
-            *ord.get_val_mut(p).unwrap() += 1;
-        } else {
-            let _ = ord.insert(c, 1);
-        }
+    let text = fs::read_to_string(PathBuf::from(FILE.to_owned())).unwrap();
+    let text = text.as_bytes().to_owned();
+
+    let mut counts: Vec<(u64, u8)> = vec![(0, 0); 256];
+    for (i, count) in counts.iter_mut().enumerate() {
+        count.1 = i as u8;
     }
-    let mut ord1: OrdArena<P0, u64, u8> = OrdArena::new();
-    for (_, c, freq) in ord.iter() {
-        let _ = ord1.insert_nonhereditary(*freq, *c);
+    for c in &text {
+        counts[usize::from(*c)].0 += 1;
     }
-    for (_, freq, c) in ord1.iter() {
-        println!("{:?} {}", char::from(*c), *freq);
+    counts.sort_by(|a, b| a.0.cmp(&b.0));
+
+    //common::remove_other_layer_keys(&mut text);
+
+    for (count, c) in &counts {
+        println!(
+            "{} {:?} {}",
+            char::try_from(*c).unwrap_or('?'),
+            char::try_from(*c),
+            count
+        );
     }
-    dbg!(ord1.len());
 }
