@@ -12,13 +12,19 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 0;
+    let rng_seed = 2;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
     // freeze backspace and space at keys 18 and 19
     opt.frozen.keys[18] = true;
     opt.frozen.keys[19] = true;
+    // freeze tab, r, s, \n
+    opt.frozen.keys[0] = true;
+    opt.frozen.keys[15] = true;
+    opt.frozen.keys[16] = true;
+    opt.frozen.keys[17] = true;
+
     for layout in &mut opt.beam {
         let layout = &mut layout.1;
         for i in 0..layout.keys.len() {
@@ -27,6 +33,18 @@ fn main() {
             }
             if layout.keys[i].0 == char_to_byte(' ').unwrap() {
                 layout.keys.swap(i, 19);
+            }
+            if layout.keys[i].0 == char_to_byte('\t').unwrap() {
+                layout.keys.swap(i, 0);
+            }
+            if layout.keys[i].0 == char_to_byte('r').unwrap() {
+                layout.keys.swap(i, 15);
+            }
+            if layout.keys[i].0 == char_to_byte('s').unwrap() {
+                layout.keys.swap(i, 16);
+            }
+            if layout.keys[i].0 == char_to_byte('\n').unwrap() {
+                layout.keys.swap(i, 17);
             }
         }
     }
@@ -59,22 +77,31 @@ fn main() {
         cost
     };
 
-    for step in 0..240 {
-        let num_samples = 1 + (step / 80);
+    let num_steps = 200;
+    for step in 0..num_steps {
+        if (step % 20) == 0 {
+            dbg!(step);
+        }
+        let num_samples = if step == (num_steps - 1) {
+            // on the last iteration get the best cases
+            32
+        } else {
+            1 + (step / 50)
+        };
         opt.step(|layout| cost_fn(num_samples, layout));
-        //dbg!(opt.beam[0].0);
-        let mut find_best = vec![];
+        /*let mut find_best = vec![];
         for (_, layout) in opt.beam.iter().take(32) {
             let cost = cost_fn(32, layout);
             find_best.push((cost, layout.to_owned()));
         }
         find_best.sort();
-        println!("{} {}", step, find_best[0].0);
-        /*if step % 20 == 0 {
-            for i in 0..32 {
-                println!("{}\n{}", find_best[i].0, find_best[i].1);
+        println!("{} {}", step, find_best[0].0);*/
+        if step == (num_steps - 1) {
+            for i in 0..10 {
+                dbg!(opt.beam[i].0);
+                println!("{}", opt.beam[i].1);
             }
-        }*/
+        }
     }
 
     let mut find_best = vec![];
@@ -105,8 +132,33 @@ k u . f p /   , N r c d m
 q l a e s i   : B S t T y
 j b _ g n w   z o ; h v x
 
+// freeze back space and tab
+
 v4:
 z w v m f /   k u d o _ y
 x a t r s N   B S T e i h
 j ; , c l .   g n p b : q
+
+// r s is common, freeze r, s, and newline. Not sure what we
+// want to do with tab, freeze it in corner
+
+v5: found this accidentally on a shorter run
+w p m l . /   , u o T : k
+j t n r s N   B S i e a y
+q h f b ; g   v _ x c d z
+
+// have found more than one with the
+u o
+  i e a
+// on the right side, v5 has y on the end which coincidentally
+// makes it easier to remember
+
+v5 also features `;` and `_` in potentially ideal places
+
+// 'x' below 'i', 'y' and 'z' close together, 'n' and 'm' close
+
+// j, z, w, q might go in special enabled zone
+
+// TODO actually fix tab
+
 */

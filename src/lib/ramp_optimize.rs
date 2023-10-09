@@ -63,7 +63,7 @@ impl RampOptimize {
                     [usize::try_from(self.rng.next_u64()).unwrap() % population]
                     .1
                     .clone();
-                // probably no reason to swap more than 8 at a time
+                // swapping
                 let num = (self.rng.next_u8() % 2) + 2;
                 inxs_to_move.clear();
                 for _ in 0..num {
