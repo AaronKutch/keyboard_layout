@@ -1,59 +1,85 @@
 use std::{fs, path::PathBuf};
 
-use common::{base_cost, colemak_dh_reference, movement_cost, qwerty_reference, AnnealRamp};
+use common::{
+    base_cost, colemak_dh_reference, movement_cost, qwerty_reference, rand_layout, AnnealRamp,
+    DispChar, Layout, StarRng,
+};
 
 fn main() {
-    let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
-    let mut text = text.as_bytes().to_owned();
-    common::remove_other_layer_keys(&mut text);
+    let population = 1000;
+    let sample_len: u64 = 1024;
 
-    //let layout = qwerty_reference();
-    let layout = qwerty_reference();
+    let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
+    let text = text.as_bytes();
 
-    let mut anneal = AnnealRamp::new(32, layout).unwrap();
+    let rng_seed = 0;
+    let mut rng = StarRng::new(rng_seed);
+    let mut anneal = AnnealRamp::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-    for step in 0..50 {
-        dbg!(anneal.beam[0].0);
-        anneal.step(|layout| {
-            let mut char_to_layout_inx: [Option<u8>; 256] = [None; 256];
-            for (i, c) in layout.keys.iter().enumerate() {
-                //assert!(char_to_layout_inx[c.0 as usize].is_none());
-                char_to_layout_inx[c.0 as usize] = Some(i as u8);
+    let mut cost_fn = |layout: &Layout<DispChar>| {
+        let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
+        for (i, c) in layout.keys.iter().enumerate() {
+            char_to_layout_inx[c.0 as usize] = DispChar(i as u8);
+        }
+
+        let len = text.len();
+        let sample_inx = usize::try_from(
+            rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
+        )
+        .unwrap();
+        let mut cost = 0;
+        for i in 0..usize::try_from(sample_len).unwrap() {
+            let j = i + sample_inx;
+            let c0 = text[j];
+            let inx0 = char_to_layout_inx[usize::from(c0)];
+            cost += base_cost(inx0.0);
+            if i > 0 {
+                let c1 = text[j - 1];
+                let inx1 = char_to_layout_inx[usize::from(c1)];
+                cost += movement_cost(&[inx0.0, inx1.0]);
             }
+        }
+        cost
+    };
 
-            let mut mapped_text = vec![];
-            for c in &text {
-                mapped_text.push(
-                    char_to_layout_inx[usize::from(*c)]
-                        .unwrap_or_else(|| panic!("{:?}", char::from(*c))),
-                );
-            }
+    for step in 0..100 {
+        anneal.step(&mut cost_fn);
+        //dbg!(anneal.beam[0].0);
+        let mut find_best = vec![];
+        for (_, layout) in anneal.beam.iter().take(32) {
             let mut cost = 0;
-            let len = mapped_text.len();
-            for i in 0..len {
-                cost += base_cost(mapped_text[i]);
-                if i > 0 {
-                    cost += movement_cost(&[mapped_text[i], mapped_text[i - 1]]);
-                }
+            for _ in 0..32 {
+                cost += cost_fn(layout);
             }
-            //dbg!(cost);
-            cost
-        });
+            find_best.push((cost, layout.to_owned()));
+        }
+        find_best.sort();
+        dbg!(find_best[0].0);
     }
-    //dbg!(&anneal);
 
-    dbg!(anneal.beam[0].0);
-    println!("annealed:\n{}", anneal.beam[0].1);
+    let mut find_best = vec![];
+    for (_, layout) in anneal.beam.iter().take(32) {
+        let mut cost = 0;
+        for _ in 0..32 {
+            cost += cost_fn(layout);
+        }
+        find_best.push((cost, layout.to_owned()));
+    }
+    find_best.sort();
+    dbg!(find_best[0].0);
+
+    println!("annealed:\n{}", find_best[0].1);
     println!("colemak:\n{}", colemak_dh_reference());
 }
-/*
-annealed:
-'\t'  'f'  'w'  'j'  '_'  'b'    '/'  'p'  'u'  'l'  'g'  '='
- 'q' '\n'  'i'  's'  't'  'm'    'a'  ' '  'e'  'd'  'o'  ';'
- 'x'  'n'  'r'  'h'  '.'  'y'    'c'  ':'  ','  'v'  'z'  'k'
 
+/*
 colemak:
-'\t'  'q'  'w'  'f'  'p'  'b'    'j'  'l'  'u'  'y'  ';'  '_'
- ':'  'a'  'r'  's'  't'  'g'    'm'  'n'  'e'  'i'  'o' '\n'
- '='  'x'  'c'  'd'  'v'  'z'    'k'  'h'  ','  '.'  '/'  ' '
+T q w f p b   j l u y ; _
+E a r s t g   m n e i o N
+: x c d v z   k h , . / S
+
+annealed:
+: . h b y ,   w n N o m k
+q a T s i u   E S r p t j
+/ f l c B d   g e _ ; v x
 */

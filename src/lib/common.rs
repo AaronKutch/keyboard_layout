@@ -13,8 +13,26 @@ pub use rng::*;
 pub struct DispChar(pub u8);
 
 impl Display for DispChar {
+    /// note: converts to lowercase and maps some special cases to uppercase
+    /// letters
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", char::from(self.0))
+        let s = self.0;
+        let c = if s == 0 {
+            'Z'
+        } else if s == char_to_byte(' ').unwrap() {
+            'S'
+        } else if s == char_to_byte('\n').unwrap() {
+            'N'
+        } else if s == char_to_byte('\t').unwrap() {
+            'T'
+        } else if s == char_to_byte('\u{8}').unwrap() {
+            'B'
+        } else if s == char_to_byte('\u{1b}').unwrap() {
+            'E'
+        } else {
+            char::from(self.0)
+        };
+        write!(f, "{}", c)
     }
 }
 
@@ -81,7 +99,28 @@ pub fn primary_layer_chars() -> Vec<char> {
     ]
     .to_vec();
     v.sort();
+    assert_eq!(v.len(), 37);
     v
+}
+
+/// Returns a randomly sorted layout
+pub fn rand_layout(rng: &mut StarRng) -> Layout<DispChar> {
+    let chars = primary_layer_chars();
+    let mut layout = Layout::new(|i| {
+        DispChar(if let Some(c) = chars.get(usize::from(i)) {
+            char_to_byte(*c).unwrap()
+        } else {
+            0
+        })
+    });
+    let len = layout.keys.len();
+    for i in 0..len {
+        layout.keys.swap(
+            i,
+            usize::try_from(rng.next_u32() % u32::try_from(len).unwrap()).unwrap(),
+        );
+    }
+    layout
 }
 
 // there is some modifier to convert to capitals

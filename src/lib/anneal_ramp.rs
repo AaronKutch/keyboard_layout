@@ -19,14 +19,22 @@ impl Debug for AnnealRamp {
 }
 
 impl AnnealRamp {
-    pub fn new(size: usize, init: Layout<DispChar>) -> Option<Self> {
-        if size == 0 {
+    pub fn new<F: FnMut(usize) -> Layout<DispChar>>(
+        rng_seed: u64,
+        population: usize,
+        mut f: F,
+    ) -> Option<Self> {
+        if population == 0 {
             None
         } else {
-            Some(Self {
-                rng: StarRng::new(0),
-                beam: vec![(u64::MAX, init); size],
-            })
+            let mut res = Self {
+                rng: StarRng::new(rng_seed),
+                beam: vec![],
+            };
+            for i in 0..population {
+                res.beam.push((u64::MAX, f(i)));
+            }
+            Some(res)
         }
     }
 
@@ -35,14 +43,14 @@ impl AnnealRamp {
         let num_keys = u8::try_from(self.beam[0].1.keys.len()).unwrap();
         // we interpolate from a 0.0 chance to be replaced for the best layout to a ~1.0
         // chance for the worst layout
-        let size = self.beam.len();
-        for i in 0..size {
+        let population = self.beam.len();
+        for i in 0..population {
             let chance = u32::try_from(
                 u64::try_from(i)
                     .unwrap()
                     .checked_shl(32)
                     .unwrap()
-                    .checked_div(u64::try_from(size).unwrap())
+                    .checked_div(u64::try_from(population).unwrap())
                     .unwrap(),
             )
             .unwrap();
@@ -50,7 +58,7 @@ impl AnnealRamp {
             if replace {
                 // choose a random layout
                 let mut replacement = self.beam
-                    [usize::try_from(self.rng.next_u64()).unwrap() % size]
+                    [usize::try_from(self.rng.next_u64()).unwrap() % population]
                     .1
                     .clone();
                 // probably no reason to swap more than 8 at a time
@@ -66,9 +74,11 @@ impl AnnealRamp {
                         usize::from(inxs_to_move[i]),
                     );
                 }
-                let cost = cost_fn(&replacement);
-                self.beam[i] = (cost, replacement);
+                self.beam[i].1 = replacement;
             }
+            // always resample cost
+            let cost = cost_fn(&self.beam[i].1);
+            self.beam[i].0 = cost;
         }
         self.beam.sort()
     }
