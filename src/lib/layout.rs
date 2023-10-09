@@ -1,5 +1,7 @@
 use std::{array, cmp::max, fmt::Display};
 
+use crate::DispChar;
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Layout<T> {
     // 6 rows of 6
@@ -130,5 +132,15 @@ impl<T> Layout<T> {
         Self {
             keys: array::from_fn(|i| f(i as u8)),
         }
+    }
+}
+
+impl Layout<DispChar> {
+    pub fn unigram_cost(&self, c0: DispChar) -> u64 {
+        base_cost(c0.0)
+    }
+
+    pub fn bigram_cost(&self, c1: DispChar, c0: DispChar) -> u64 {
+        base_cost(c0.0) + movement_cost(&[c0.0, c1.0])
     }
 }

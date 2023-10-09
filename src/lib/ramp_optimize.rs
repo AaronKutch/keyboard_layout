@@ -75,8 +75,8 @@ impl RampOptimize {
                     [usize::try_from(self.rng.next_u64()).unwrap() % population]
                     .1
                     .clone();
-                // swapping
-                let num = (self.rng.next_u8() % 2) + 2;
+                // swapping. it seems that single swaps work the best
+                let num = /*(self.rng.next_u8() % 2) +*/ 2u8;
                 inxs_to_move.clear();
                 for _ in 0..num {
                     // TODO this is inefficient

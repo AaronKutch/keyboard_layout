@@ -1,9 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use common::{
-    base_cost, colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout, RampOptimize,
-    StarRng,
-};
+use common::{colemak_dh_reference, rand_layout, DispChar, Layout, RampOptimize, StarRng};
 
 fn main() {
     let population = 1024;
@@ -25,28 +22,22 @@ fn main() {
     //opt.freeze_key('s', 16);
     //opt.freeze_key('\n', 17);
 
-    let mut cost_fn = |num_samples: usize, layout: &Layout<DispChar>| {
+    let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
         for (i, c) in layout.keys.iter().enumerate() {
             char_to_layout_inx[c.0 as usize] = DispChar(i as u8);
         }
 
         let mut cost = 0;
-        for _ in 0..num_samples {
-            let len = text.len();
-            let sample_inx = usize::try_from(
-                rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
-            )
-            .unwrap();
+        for sample_start in samples {
             for i in 0..usize::try_from(sample_len).unwrap() {
-                let j = i + sample_inx;
-                let c0 = text[j];
-                let inx0 = char_to_layout_inx[usize::from(c0)];
-                cost += base_cost(inx0.0);
+                let j = i + sample_start;
+                let c0 = char_to_layout_inx[usize::from(text[j])];
+                let c1 = char_to_layout_inx[usize::from(text[j - 1])];
                 if i > 0 {
-                    let c1 = text[j - 1];
-                    let inx1 = char_to_layout_inx[usize::from(c1)];
-                    cost += movement_cost(&[inx0.0, inx1.0]);
+                    cost += layout.bigram_cost(c1, c0);
+                } else {
+                    cost += layout.unigram_cost(c0);
                 }
             }
         }
@@ -64,7 +55,16 @@ fn main() {
         } else {
             1 + (step / 50)
         };
-        opt.step(|layout| cost_fn(num_samples, layout));
+        let mut sample_starts = vec![];
+        for _ in 0..num_samples {
+            let len = text.len();
+            let sample_inx = usize::try_from(
+                rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
+            )
+            .unwrap();
+            sample_starts.push(sample_inx);
+        }
+        opt.step(|layout| cost_fn(&sample_starts, layout));
         /*let mut find_best = vec![];
         for (_, layout) in opt.beam.iter().take(32) {
             let cost = cost_fn(32, layout);
@@ -73,22 +73,45 @@ fn main() {
         find_best.sort();
         println!("{} {}", step, find_best[0].0);*/
         if step == (num_steps - 1) {
-            for i in 0..10 {
+            for i in 0..1 {
                 dbg!(opt.beam[i].0);
                 println!("{}", opt.beam[i].1);
             }
         }
     }
 
+    let num_samples = 128;
+    let mut sample_starts = vec![];
+    for _ in 0..num_samples {
+        let len = text.len();
+        let sample_inx = usize::try_from(
+            rng.next_u64() % u64::try_from(len).unwrap().checked_sub(sample_len).unwrap(),
+        )
+        .unwrap();
+        sample_starts.push(sample_inx);
+    }
+
     let mut find_best = vec![];
     for (_, layout) in opt.beam.iter().take(32) {
-        let cost = cost_fn(32, layout);
+        let cost = cost_fn(&sample_starts, layout);
         find_best.push((cost, layout.to_owned()));
     }
     find_best.sort();
     dbg!(find_best[0].0);
+    let best = find_best[0].1.clone();
 
-    println!("opted:\n{}", find_best[0].1);
+    /*for i in 0..36 {
+        dbg!(i);
+        for j in 0..36 {
+            let mut trial_swap = best.clone();
+            trial_swap.keys.swap(i, j);
+            if (cost_fn(32, &trial_swap) + 100000) < cost_fn(32, &best) {
+                best = trial_swap;
+            }
+        }
+    }*/
+
+    println!("opted:\n{}", best);
     println!("colemak:\n{}", colemak_dh_reference());
 }
 
@@ -135,9 +158,9 @@ v5 also features `;` and `_` in potentially ideal places
 
 // j, z, w, q might go in special enabled zone
 
-v6:
-T , N h : ;   b y p _ d j
-g B n s t u   o r e a S x
-q z w f i k   . l m c / v
+keep tab in upper corner
+
+map newline or `_` as shift + space
+map delete as shift + backspace
 
 */
