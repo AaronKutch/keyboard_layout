@@ -1,7 +1,8 @@
 use std::{fs, path::PathBuf};
 
 use common::{
-    colemak_dh_reference, qwerty_reference, std_primary_map, tlrs_reference, DispChar, Layout,
+    colemak_dh_reference, dvorak_reference, isrt_reference, qwerty_reference, std_primary_map,
+    tlrs_reference, DispChar, Layout,
 };
 
 const FILE: &str = "./test_english.txt";
@@ -78,10 +79,20 @@ fn main() {
     let layout = colemak_dh_reference();
     let cost = cost_fn(&text1, &layout);
     println!("colemak: {}\n{}", cost, layout);
-    println!("improvement over qwerty: {}", qwerty_cost / (cost as f64));
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = dvorak_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("dvorak: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = isrt_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("ISRT: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 
     let layout = tlrs_reference();
     let cost = cost_fn(&text1, &layout);
     println!("TLRS ,/b; _.: {}\n{}", cost, layout);
-    println!("improvement over qwerty: {}", qwerty_cost / (cost as f64));
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 }

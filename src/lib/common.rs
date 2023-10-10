@@ -189,6 +189,30 @@ pub fn colemak_dh_reference() -> Layout<DispChar> {
     res
 }
 
+pub fn dvorak_reference() -> Layout<DispChar> {
+    let mut res = Layout {
+        keys: [DispChar(0); 36],
+    };
+    let s = "\u{8}q,.pyfgcrl/\taoeuidhtns\n _qjkxbmwvz ";
+    assert_eq!(s.len(), res.keys.len());
+    for (i, c) in s.chars().enumerate() {
+        res.keys[i] = DispChar(u8::try_from(c).unwrap());
+    }
+    res
+}
+
+pub fn isrt_reference() -> Layout<DispChar> {
+    let mut res = Layout {
+        keys: [DispChar(0); 36],
+    };
+    let s = "\u{8}yclmkzfu_, \tisrtgpneao\n qvwdjbh/.  ";
+    assert_eq!(s.len(), res.keys.len());
+    for (i, c) in s.chars().enumerate() {
+        res.keys[i] = DispChar(u8::try_from(c).unwrap());
+    }
+    res
+}
+
 pub fn tlrs_reference() -> Layout<DispChar> {
     /*
     E w b / m v   y u o h . j
