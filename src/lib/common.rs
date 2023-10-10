@@ -169,7 +169,7 @@ pub fn qwerty_reference() -> Layout<DispChar> {
     let mut res = Layout {
         keys: [DispChar(0); 36],
     };
-    let s = "\tqwertyuiop_\u{1b}asdfghjkl;\n:zxcvbnm,./ ";
+    let s = "\u{8}qwertyuiop_\tasdfghjkl;\n zxcvbnm,./ ";
     assert_eq!(s.len(), res.keys.len());
     for (i, c) in s.chars().enumerate() {
         res.keys[i] = DispChar(u8::try_from(c).unwrap());
@@ -181,7 +181,24 @@ pub fn colemak_dh_reference() -> Layout<DispChar> {
     let mut res = Layout {
         keys: [DispChar(0); 36],
     };
-    let s = "\tqwfpbjluy;_\u{1b}arstgmneio\n:xcdvzkh,./ ";
+    let s = "\u{8}qwfpbjluy;_\tarstgmneio\n xcdvzkh,./ ";
+    assert_eq!(s.len(), res.keys.len());
+    for (i, c) in s.chars().enumerate() {
+        res.keys[i] = DispChar(u8::try_from(c).unwrap());
+    }
+    res
+}
+
+pub fn tlrs_reference() -> Layout<DispChar> {
+    /*
+    E w b / m v   y u o h . j
+    T t l r s p   B S i e a N
+    q , g d n k   ; _ c x f z
+    */
+    let mut res = Layout {
+        keys: [DispChar(0); 36],
+    };
+    let s = "\u{1b}wb/mvyuoh.j\ttlrsp\u{8} iea\nq,gdnk;_cxfz";
     assert_eq!(s.len(), res.keys.len());
     for (i, c) in s.chars().enumerate() {
         res.keys[i] = DispChar(u8::try_from(c).unwrap());

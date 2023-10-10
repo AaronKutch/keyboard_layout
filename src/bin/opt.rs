@@ -226,8 +226,11 @@ T t l r s p   B S i e a N
 q , g d n k   ; _ c x f z
 
 v7
-Z w b / m v   y u o h . j
+E w b / m v   y u o h . j
 T t l r s p   B S i e a N
 q , g d n k   ; _ c x f z
 
+where `E` is escape. shift + `/` = `?` which happens to
+simultaneously line up with the dual layout and the
+correspondance on standard qwerty
 */
