@@ -9,21 +9,32 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 10;
+    let rng_seed = 12;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-    /*opt.freeze_key('\t', 0);
+    opt.freeze_key('\t', 12);
     opt.freeze_key('\u{8}', 18);
     opt.freeze_key(' ', 19);
     opt.freeze_key('_', 31);
     opt.freeze_key('r', 15);
     opt.freeze_key('s', 16);
-    opt.freeze_key(';', 30);*/
+    opt.freeze_key(';', 30);
 
-    //opt.freeze_key('\u{8}', 18);
-    //opt.freeze_key(' ', 19);
-    //opt.freeze_key('\n', 17);
+    opt.freeze_key('a', 22);
+    opt.freeze_key('e', 21);
+    opt.freeze_key('i', 20);
+    opt.freeze_key('o', 8);
+    opt.freeze_key('u', 7);
+    opt.freeze_key('y', 6);
+
+    opt.freeze_key('t', 13);
+    opt.freeze_key('l', 14);
+
+    opt.freeze_key('\n', 23);
+
+    opt.freeze_key('q', 24);
+    opt.freeze_key('z', 35);
 
     // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
@@ -101,18 +112,23 @@ fn main() {
         find_best.push((cost, layout.to_owned()));
     }
     find_best.sort();
-    let best = find_best[0].1.clone();
+    let mut best = find_best[0].1.clone();
 
-    /*for i in 0..36 {
-        dbg!(i);
-        for j in 0..36 {
-            let mut trial_swap = best.clone();
-            trial_swap.keys.swap(i, j);
-            if (cost_fn(32, &trial_swap) + 100000) < cost_fn(32, &best) {
-                best = trial_swap;
+    for _ in 0..10 {
+        for i in 0..36 {
+            //dbg!(i);
+            for j in 0..36 {
+                if opt.frozen.keys[i] || opt.frozen.keys[j] {
+                    continue
+                }
+                let mut trial_swap = best.clone();
+                trial_swap.keys.swap(i, j);
+                if (cost_fn(&sample_starts, &trial_swap) + 10000) < cost_fn(&sample_starts, &best) {
+                    best = trial_swap;
+                }
             }
         }
-    }*/
+    }
 
     println!("opted:\n{}", best);
     println!("colemak:\n{}", colemak_dh_reference());
@@ -171,5 +187,47 @@ commiting to making `:` from shift + `;`
 T / g m p b   . o N y u Z
 j n t r s h   B S i a e x
 q , v c l k   ; _ f w d z
+
+I have fixed aeiouy in reverse order for easy memorization, it seems to
+actually improve perf
+tlrs comes up in a row often it seems
+
+on a staggered keyboard the
+B S
+; _
+square works well
+
+v6
+T , f N / w   y u o . h j
+Z t l r s p   B S i e a k
+q x d c n v   ; _ m b g z
+
+even with brute force swap optimization it really likes `t l r s`` so I have frozen it
+
+also q and z like their respective corners so I have frozen them as well
+
+I also move new line to the right column middle row, I don't really have a problem
+with that short pinky movement
+
+T / v p m w   y u o . N Z
+j t l r s h   B S i e a x
+q , f d n k   ; _ c g b z
+
+T m b / p v   y u o . N j
+Z t l r s h   B S i e a x
+q , g d n k   ; _ c w f z
+
+T x m / p v   y u o h . Z
+j t l r s c   B S i e a N
+q g , d n k   ; _ f b w z
+
+j v b / m w   y u o h . Z
+T t l r s p   B S i e a N
+q , g d n k   ; _ c x f z
+
+v7
+Z w b / m v   y u o h . j
+T t l r s p   B S i e a N
+q , g d n k   ; _ c x f z
 
 */

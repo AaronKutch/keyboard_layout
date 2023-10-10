@@ -54,7 +54,14 @@ impl RampOptimize {
 
     pub fn step<F: FnMut(&Layout<DispChar>) -> u64>(&mut self, mut cost_fn: F) {
         let mut inxs_to_move = SmallVec::<[u8; 8]>::new();
-        let num_keys = u8::try_from(self.beam[0].1.keys.len()).unwrap();
+
+        let mut count = 0;
+        for b in self.frozen.keys {
+            if b {
+                count += 1;
+            }
+        }
+        let num_unfrozen_keys = u8::try_from(self.beam[0].1.keys.len() - count).unwrap();
         // we interpolate from a 0.0 chance to be replaced for the best layout to a ~1.0
         // chance for the worst layout
         let population = self.beam.len();
@@ -76,17 +83,26 @@ impl RampOptimize {
                     .1
                     .clone();
                 // swapping. it seems that single swaps work the best
-                let num = /*(self.rng.next_u8() % 2) + */2u8;
+                let num = 2u8;
+                /* + (self.rng.next_u8() % 2) */
                 inxs_to_move.clear();
+                // this is ugly but the sampling step is far more expensive
                 for _ in 0..num {
-                    // TODO this is inefficient
+                    // we skip over frozen keys as if they were not there
+                    let mut inx = self.rng.next_u8() % num_unfrozen_keys;
+                    let mut j = 0u8;
                     loop {
-                        let inx = self.rng.next_u8() % num_keys;
-                        if !self.frozen.keys[usize::from(inx)] {
-                            inxs_to_move.push(inx);
-                            break
+                        if self.frozen.keys[usize::from(j)] {
+                            inx += 1;
+                            j += 1;
+                        } else {
+                            if j >= inx {
+                                break
+                            }
+                            j += 1;
                         }
                     }
+                    inxs_to_move.push(inx);
                 }
                 // `inxs_to_move` is already scrambled, move in chain
                 for i in 1..usize::from(num) {
