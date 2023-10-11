@@ -215,17 +215,18 @@ pub fn isrt_reference() -> Layout<DispChar> {
 
 pub fn tlrs_reference() -> Layout<DispChar> {
     /*
-    E w b / m v   y u o h . j
+    E w b / m v   y u o _ . j
     T t l r s p   B S i e a N
-    q , g d n k   ; _ c x f z
+    q , g d n k   ; h c x f z
     */
     let mut res = Layout {
         keys: [DispChar(0); 36],
     };
-    let s = "\u{1b}wb/mvyuoh.j\ttlrsp\u{8} iea\nq,gdnk;_cxfz";
+    let s = "\u{1b}wb/mvyuo_.j\ttlrsp\u{8} iea\nq,gdnk;hcxfz";
     assert_eq!(s.len(), res.keys.len());
     for (i, c) in s.chars().enumerate() {
         res.keys[i] = DispChar(u8::try_from(c).unwrap());
     }
     res
 }
+*/
