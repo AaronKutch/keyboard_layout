@@ -1,8 +1,8 @@
 use std::{fs, path::PathBuf};
 
 use common::{
-    colemak_dh_reference, dvorak_reference, isrt_reference, qwerty_reference, std_primary_map,
-    tlrs_reference, DispChar, Layout,
+    colemak_dh_reference, dvorak_reference, isrt_reference, movement_cost, qwerty_reference,
+    std_primary_map, tlrs_reference, DispChar, Layout,
 };
 
 const FILE: &str = "./test_english.txt";
@@ -51,22 +51,27 @@ fn main() {
     text1.retain(|c| *c != b'_');
 
     let cost_fn = |sample: &[u8], layout: &Layout<DispChar>| {
-        let mut char_to_layout_inx: [DispChar; 256] = [DispChar(0); 256];
+        let mut char_to_layout_inx: [u8; 256] = [0; 256];
         for (i, c) in layout.keys.iter().enumerate() {
-            char_to_layout_inx[c.0 as usize] = DispChar(i as u8);
+            char_to_layout_inx[c.0 as usize] = i as u8;
         }
 
         let mut cost = 0;
-        for j in 1..sample.len() {
-            let c0 = char_to_layout_inx[usize::from(sample[j])];
-            let c1 = char_to_layout_inx[usize::from(sample[j - 1])];
-            // don't include costs of spaces
-            if c0.0 != b' ' {
-                cost += layout.unigram_cost(c0);
-                if c1.0 != b' ' {
-                    cost += layout.bigram_cost(c1, c0);
-                }
+        let mut v = vec![];
+        for i in 0..sample.len() {
+            if text[i] == b' ' {
+                // TODO
+                continue
             }
+            let mapped = char_to_layout_inx[usize::from(text[i])];
+            if mapped == b' ' {
+                continue
+            }
+            v.push(mapped);
+            if v.len() > 3 {
+                v.remove(0);
+            }
+            cost += movement_cost(&v);
         }
         cost
     };

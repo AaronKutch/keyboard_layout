@@ -1,7 +1,5 @@
 use std::{array, cmp::max, fmt::Display};
 
-use crate::DispChar;
-
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Layout<T> {
     // 6 rows of 6
@@ -39,94 +37,6 @@ impl<T: Display> Display for Layout<T> {
     }
 }
 
-pub fn middle_column(i: u8) -> bool {
-    matches!(i, 5 | 6 | 17 | 18 | 29 | 30)
-}
-
-pub fn index_column(i: u8) -> bool {
-    matches!(i, 4 | 7 | 16 | 19 | 28 | 29)
-}
-
-pub fn ext_pinky(i: u8) -> bool {
-    matches!(i, 0 | 11 | 12 | 23 | 24 | 35)
-}
-
-pub fn left_side(i: u8) -> bool {
-    matches!(i, 0..=5 | 12..=17 | 24..=35)
-}
-
-pub fn middle_row(i: u8) -> bool {
-    matches!(i, 12..=23)
-}
-
-pub fn upper_row(i: u8) -> bool {
-    matches!(i, 0..=11)
-}
-
-pub fn lower_row(i: u8) -> bool {
-    matches!(i, 24..=35)
-}
-
-pub fn column(i: u8) -> u8 {
-    i % 12
-}
-
-/// Base cost of pressing a key
-pub fn base_cost(i: u8) -> u64 {
-    match i {
-        // 8 main keys
-        13..=16 | 19..=22 => 100,
-        // two below index finger
-        28 | 31 => 150,
-        // other keys in index and middle orthogonal neighborhood
-        3 | 4 | 7 | 8 | 17 | 18 | 27 | 32 => 200,
-        // other orthogonal keys in main group
-        1 | 2 | 9 | 10 | 25 | 26 | 33 | 34 => 250,
-        // diagonal to index
-        5 | 6 | 29 | 30 => 300,
-        // pinky extension
-        _ => 400,
-    }
-}
-
-/// A record of up to the last few keys, with the zeroeth being the most recent
-/// press
-pub fn movement_cost(x: &[u8]) -> u64 {
-    let mut c = 0;
-    if x.len() > 1 {
-        if left_side(x[0]) == left_side(x[1]) {
-            // same side
-
-            // mid to upper or lower row changes on same side
-            if !middle_row(x[0]) && middle_row(x[1]) {
-                c += 100;
-            }
-
-            // these kinds of changes are always ugly
-            if (upper_row(x[0]) && lower_row(x[1])) || (lower_row(x[0]) && upper_row(x[1])) {
-                c += 200;
-            }
-
-            // penalize rolling outwards a little
-            if left_side(x[0]) {
-                if column(x[0]) > column(x[1]) {
-                    c += 30;
-                }
-            } else if column(x[0]) < column(x[1]) {
-                c += 30;
-            }
-        }
-
-        // a key in the index or middle column was pressed and then a far pinky is
-        // pressed, heavily penalize
-        if (index_column(x[1]) || middle_column(x[1])) && ext_pinky(x[0]) {
-            c += 400;
-        }
-    }
-    //if x.len() > 2 {}
-    c
-}
-
 impl<T> Layout<T> {
     pub fn new<F: FnMut(u8) -> T>(mut f: F) -> Self {
         Self {
@@ -135,12 +45,130 @@ impl<T> Layout<T> {
     }
 }
 
-impl Layout<DispChar> {
-    pub fn unigram_cost(&self, c0: DispChar) -> u64 {
-        base_cost(c0.0)
-    }
+pub fn column(i: u8) -> u8 {
+    i % 12
+}
 
-    pub fn bigram_cost(&self, c1: DispChar, c0: DispChar) -> u64 {
-        base_cost(c0.0) + movement_cost(&[c0.0, c1.0])
+pub fn row(i: u8) -> u8 {
+    i / 12
+}
+
+pub fn right_side(i: u8) -> bool {
+    column(i) >= 6
+}
+
+pub fn same_side(i: u8, j: u8) -> bool {
+    right_side(i) == right_side(j)
+}
+
+pub fn neighboring_columns(i: u8, j: u8) -> bool {
+    (column(i) + 1 == column(j)) || (column(i) == column(j) + 1)
+}
+
+pub fn between_groups(group0: &[u8], group1: &[u8], i: u8, j: u8) -> bool {
+    (group0.contains(&column(i)) && group1.contains(&column(j)))
+        || (group1.contains(&column(i)) && group0.contains(&column(j)))
+}
+
+pub fn neighboring_between_column_groups(group0: &[u8], group1: &[u8], i: u8, j: u8) -> bool {
+    neighboring_columns(i, j) && between_groups(group0, group1, i, j)
+}
+
+pub fn diagonal_penalty(i: u8, j: u8) -> u64 {
+    let mut c = 0;
+    let group0 = [2, 3, 8, 9];
+    let group1 = [1, 4, 7, 10];
+    if same_side(i, j) {
+        // penalize rolling outwards slightly
+        if right_side(i) {
+            if column(i) > column(j) {
+                c += 50;
+            }
+        } else {
+            if column(i) < column(j) {
+                c += 50;
+            }
+        }
+        if neighboring_columns(i, j) {
+            // things like 'e'<->'f' on QWERTY is easy but 'c'<->'f' is hard. However, this
+            // is on a staggered keyboard, I plan on using a vertically staggered ortho
+            // keyboard that would make 'e'<->'f' harder and 'c'<->'f' easier. The vertical
+            // stagger differs between boards. I will take the middle ground by penalizing
+            // all immediate diagonals, and penalize movements between the group of columns
+            // 2,3,8,9 and the group 1,4,7,10 more strongly.
+            let bad_coincidence = between_groups(&group0, &group1, i, j);
+            if bad_coincidence {
+                c += 100;
+            }
+            if row(i).abs_diff(row(j)) == 1 {
+                c += 100;
+            } else if row(i).abs_diff(row(j)) == 2 {
+                // always very bad to splay your fingers
+                c += 200;
+            }
+        }
     }
+    c
+}
+
+/// A record of the last few keys, in order from older to newer keys
+pub fn movement_cost(older_to_newer: &[u8]) -> u64 {
+    let len = older_to_newer.len();
+    let mut c = 0;
+    let group1 = [1, 4, 7, 10];
+    let group2 = [0, 5, 6, 11];
+    if len >= 1 {
+        let i = older_to_newer[len - 1];
+        // base cost of pressing key
+        c += match i {
+            // 8 main keys
+            13..=16 | 19..=22 => 100,
+            // two below index finger, 4 above middle and ring fingers
+            28 | 31 | 2 | 3 | 8 | 9 => 150,
+            // not too high, other rules are more important
+            _ => 200,
+        };
+    }
+    if len >= 2 {
+        let i = older_to_newer[len - 1];
+        let j = older_to_newer[len - 2];
+        if column(i) == column(j) {
+            if row(i).abs_diff(row(j)) == 1 {
+                // immediate vertical redirects
+                c += 300;
+            }
+            if row(i).abs_diff(row(j)) == 2 {
+                // heavily penalize vertical redirects from top to bottom row or vice versa
+                c += 500;
+            }
+        }
+        // also need to count redirects on pinky and index finger
+        if neighboring_between_column_groups(&group1, &group2, i, j) {
+            // diagonal penalty will add the needed extra penalty for cases like 'f' to 'b'
+            // on QWERTY
+            c += 200;
+        }
+        c += diagonal_penalty(i, j);
+    }
+    if len >= 3 {
+        let i = older_to_newer[len - 1];
+        // I think that maybe we actually don't incorporate `j`, because there will be
+        // two bad i,j costs in subsequent steps if they were actually a problem on the
+        // same hand let j = older_to_newer[len - 2];
+        let k = older_to_newer[len - 3];
+        if column(i) == column(k) {
+            // redirects on recent keys
+            if row(i).abs_diff(row(k)) == 1 {
+                c += 100;
+            }
+            if row(i).abs_diff(row(k)) == 2 {
+                c += 200;
+            }
+        }
+        if neighboring_between_column_groups(&group1, &group2, i, k) {
+            c += 50;
+        }
+        c += diagonal_penalty(i, k) / 3;
+    }
+    c
 }
