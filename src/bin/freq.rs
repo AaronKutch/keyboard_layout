@@ -15,8 +15,6 @@ fn main() {
     }
     counts.sort_by(|a, b| a.0.cmp(&b.0));
 
-    //common::remove_other_layer_keys(&mut text);
-
     for (count, c) in &counts {
         println!(
             "{} {:?} {}",

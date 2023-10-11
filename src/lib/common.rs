@@ -91,15 +91,17 @@ pub fn lowercase_alpha_chars() -> Vec<char> {
     .to_vec()
 }
 
-// the tab here is the miscellanious one, also wanted the escape char `\u{1b}`
+// space, tab, enter, escape need to be handled by thumbs and special keys
+// '(', ')' have a high enough frequency, and I will remap intentation changing
+// to shift plus them
 pub fn primary_layer_chars() -> Vec<char> {
     let mut v = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', ' ', '\u{8}', '\t', '\n', '/', '.', ',', ';',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '/', '.', ',', ';', '(', ')',
     ]
     .to_vec();
     v.sort();
-    assert_eq!(v.len(), 35);
+    assert_eq!(v.len(), 33);
     v
 }
 

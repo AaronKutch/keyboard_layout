@@ -11,32 +11,9 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 0;
+    let rng_seed = 1;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
-
-    /*opt.freeze_key('\t', 12);
-    opt.freeze_key('\u{8}', 18);
-    opt.freeze_key(' ', 19);
-    opt.freeze_key('_', 31);
-    opt.freeze_key('r', 15);
-    opt.freeze_key('s', 16);
-    opt.freeze_key(';', 30);
-
-    opt.freeze_key('a', 22);
-    opt.freeze_key('e', 21);
-    opt.freeze_key('i', 20);
-    opt.freeze_key('o', 8);
-    opt.freeze_key('u', 7);
-    opt.freeze_key('y', 6);
-
-    opt.freeze_key('t', 13);
-    opt.freeze_key('l', 14);
-
-    opt.freeze_key('\n', 23);
-
-    opt.freeze_key('q', 24);
-    opt.freeze_key('z', 35);*/
 
     // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
@@ -89,6 +66,7 @@ fn main() {
         find_best.sort();*/
         //println!("{} {}", step, find_best[0].0);
         if step == (num_steps - 1) {
+            // for checking that the distribution is not too chaotic
             for i in 0..1 {
                 dbg!(opt.beam[i].0);
                 println!("{}", opt.beam[i].1);
@@ -115,23 +93,43 @@ fn main() {
     find_best.sort();
     let mut best = find_best[0].1.clone();
 
-    for _ in 0..10 {
+    loop {
+        let mut best_swaps = vec![];
         for i in 0..36 {
-            //dbg!(i);
-            for j in 0..36 {
+            for j in 0..i {
                 if opt.frozen.keys[i] || opt.frozen.keys[j] {
                     continue
                 }
                 let mut trial_swap = best.clone();
                 trial_swap.keys.swap(i, j);
-                if (cost_fn(&sample_starts, &trial_swap) + 10000) < cost_fn(&sample_starts, &best) {
-                    best = trial_swap;
+                let cost_diff = cost_fn(&sample_starts, &best)
+                    .saturating_sub(cost_fn(&sample_starts, &trial_swap));
+                if cost_diff > 0 {
+                    best_swaps.push((cost_diff, i, j));
                 }
             }
         }
+        best_swaps.sort();
+        best_swaps.reverse();
+
+        if let Some(swap) = best_swaps.get(0) {
+            println!(
+                "{} <-> {}, {}",
+                best.keys[swap.1], best.keys[swap.2], swap.0
+            );
+            best.keys.swap(swap.1, swap.2);
+            println!("new best:\n{}", best);
+        } else {
+            break
+        }
     }
 
-    println!("opted:\n{}", best);
+    /*println!("best swaps from brute forcer:");
+    for swap in best_swaps.iter().take(10) {
+        println!("{} <-> {}, {}", best.keys[swap.1], best.keys[swap.2], swap.0);
+    }*/
+
+    //println!("opted:\n{}", best);
     println!("colemak:\n{}", colemak_dh_reference());
 }
 
@@ -227,7 +225,21 @@ with my cost function in regards to bigrams and redirections.
 After thinking about it some more, I need to reorient around the time it takes to move
 fingers between alternations. e.x. on qwerty, if I have been using my right hand and
 then follow up with 'e' and 'f', I will have already adjusted my middle finger to
-type the 'e' immediately followed by the 'f', so there isn't actually delay from
-changing rows. I will also try out having no base cost.
+type the 'e' immediately followed by the 'f', so there is little delay from
+changing rows.
+
+From practice, I also found that putting space in the primary set was going to put too
+much load on my right hand, defeating the purposes of this program. I have decided upon
+putting space and newline on the thumbs of an ortholinear, only delaying switching slightly.
+
+l m c b / d   u z o i ) w
+h r s n t v   k e a Z _ g
+; Z q , p f   y . Z j ( x
+
+v8: FTL
+y Z o , q h   k w c r j d
+. i e a n p   f t l _ x s
+u ( ) ; / b   v m z Z Z g
+
 
 */
