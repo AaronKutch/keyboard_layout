@@ -84,10 +84,8 @@ pub fn diagonal_penalty(i: u8, j: u8) -> u64 {
             if column(i) > column(j) {
                 c += 50;
             }
-        } else {
-            if column(i) < column(j) {
-                c += 50;
-            }
+        } else if column(i) < column(j) {
+            c += 50;
         }
         if neighboring_columns(i, j) {
             // things like 'e'<->'f' on QWERTY is easy but 'c'<->'f' is hard. However, this
@@ -125,6 +123,8 @@ pub fn movement_cost(older_to_newer: &[u8]) -> u64 {
             13..=16 | 19..=22 => 100,
             // two below index finger, 4 above middle and ring fingers
             28 | 31 | 2 | 3 | 8 | 9 => 150,
+            // get stuff away from the pinkies
+            0 | 11 | 12 | 23 | 24 | 35 => 400,
             // not too high, other rules are more important
             _ => 200,
         };

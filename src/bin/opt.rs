@@ -1,23 +1,21 @@
 use std::{fs, path::PathBuf};
 
-use common::{
-    colemak_dh_reference, movement_cost, rand_layout, DispChar, Layout, RampOptimize, StarRng,
-};
+use common::{movement_cost, rand_layout, DispChar, Layout, RampOptimize, StarRng};
 
 fn main() {
     let population = 1024;
     let sample_len: u64 = 1024;
 
-    let text = fs::read_to_string(PathBuf::from("./primary_layer_text.txt".to_owned())).unwrap();
+    let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 1;
+    let rng_seed = 2;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
     // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
-        let mut char_to_layout_inx: [u8; 256] = [9; 256];
+        let mut char_to_layout_inx: [u8; 256] = [u8::MAX; 256];
         for (i, c) in layout.keys.iter().enumerate() {
             char_to_layout_inx[c.0 as usize] = i as u8;
         }
@@ -26,8 +24,12 @@ fn main() {
         for sample_start in samples {
             let mut v = vec![];
             for i in 0..usize::try_from(sample_len).unwrap() {
-                let j = i + sample_start;
-                v.push(char_to_layout_inx[usize::from(text[j])]);
+                let inx = char_to_layout_inx[usize::from(text[i + sample_start])];
+                if inx == u8::MAX {
+                    v.clear();
+                    continue
+                }
+                v.push(inx);
                 if v.len() > 3 {
                     v.remove(0);
                 }
@@ -94,16 +96,13 @@ fn main() {
     let mut best = find_best[0].1.clone();
 
     loop {
+        let unswapped_cost = cost_fn(&sample_starts, &best);
         let mut best_swaps = vec![];
         for i in 0..36 {
             for j in 0..i {
-                if opt.frozen.keys[i] || opt.frozen.keys[j] {
-                    continue
-                }
                 let mut trial_swap = best.clone();
                 trial_swap.keys.swap(i, j);
-                let cost_diff = cost_fn(&sample_starts, &best)
-                    .saturating_sub(cost_fn(&sample_starts, &trial_swap));
+                let cost_diff = unswapped_cost.saturating_sub(cost_fn(&sample_starts, &trial_swap));
                 if cost_diff > 0 {
                     best_swaps.push((cost_diff, i, j));
                 }
@@ -112,25 +111,22 @@ fn main() {
         best_swaps.sort();
         best_swaps.reverse();
 
-        if let Some(swap) = best_swaps.get(0) {
+        if let Some(swap) = best_swaps.first() {
             println!(
                 "{} <-> {}, {}",
                 best.keys[swap.1], best.keys[swap.2], swap.0
             );
             best.keys.swap(swap.1, swap.2);
-            println!("new best:\n{}", best);
+            println!("new best: {} \n{}", unswapped_cost - swap.0, best);
         } else {
             break
         }
     }
 
-    /*println!("best swaps from brute forcer:");
-    for swap in best_swaps.iter().take(10) {
-        println!("{} <-> {}, {}", best.keys[swap.1], best.keys[swap.2], swap.0);
-    }*/
-
-    //println!("opted:\n{}", best);
-    println!("colemak:\n{}", colemak_dh_reference());
+    for c in best.keys {
+        print!("{c}");
+    }
+    println!();
 }
 
 /*
@@ -241,5 +237,27 @@ y Z o , q h   k w c r j d
 . i e a n p   f t l _ x s
 u ( ) ; / b   v m z Z Z g
 
+v9: room for customization around j,q,(,) for boards without the pinky column, also
+ there is a free space for something
+j u o / ; w   m k l _ v q
+( i e a t d   p n r s c )
+  y , . f g   b h x   z
+
+after fixing bug
+l u o . q w   v k l m _
+( i e a t g   p n r s c )
+y z / d f   b h x , j
+
+j v c ) k m   . / u o f Z
+z n r t l d   _ i e a s Z
+q p b w g h   ( , y ; x Z
+
+j . c o y (   g v m l b z
+Z i p e a _   h s r t n q
+Z , ; ) / u   f d x k w Z
+
+z b f l w g   ( , u ) x Z
+v n t r s c   _ i e a o Z
+q p ; k m d   . / j y h Z
 
 */

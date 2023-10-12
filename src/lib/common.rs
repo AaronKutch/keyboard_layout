@@ -151,6 +151,19 @@ pub fn delim_layer_chars() -> Vec<char> {
 
 */
 
+macro_rules! map {
+    ($s:expr) => {{
+        let mut res = Layout {
+            keys: [DispChar(0); 36],
+        };
+        assert_eq!($s.len(), res.keys.len());
+        for (i, c) in $s.chars().enumerate() {
+            res.keys[i] = DispChar(u8::try_from(c).unwrap());
+        }
+        res
+    }};
+}
+
 // maps all bytes to the primary layer chars, also lowercasing alphabetical
 // chars
 pub fn std_primary_map() -> [u8; 256] {
@@ -168,51 +181,19 @@ pub fn std_primary_map() -> [u8; 256] {
 }
 
 pub fn qwerty_reference() -> Layout<DispChar> {
-    let mut res = Layout {
-        keys: [DispChar(0); 36],
-    };
-    let s = "\u{8}qwertyuiop_\tasdfghjkl;\n zxcvbnm,./ ";
-    assert_eq!(s.len(), res.keys.len());
-    for (i, c) in s.chars().enumerate() {
-        res.keys[i] = DispChar(u8::try_from(c).unwrap());
-    }
-    res
+    map!("~qwertyuiop_~asdfghjkl;~~zxcvbnm,./~")
 }
 
 pub fn colemak_dh_reference() -> Layout<DispChar> {
-    let mut res = Layout {
-        keys: [DispChar(0); 36],
-    };
-    let s = "\u{8}qwfpbjluy;_\tarstgmneio\n xcdvzkh,./ ";
-    assert_eq!(s.len(), res.keys.len());
-    for (i, c) in s.chars().enumerate() {
-        res.keys[i] = DispChar(u8::try_from(c).unwrap());
-    }
-    res
+    map!("~qwfpbjluy;_~arstgmneio~~xcdvzkh,./~")
 }
 
 pub fn dvorak_reference() -> Layout<DispChar> {
-    let mut res = Layout {
-        keys: [DispChar(0); 36],
-    };
-    let s = "\u{8}q,.pyfgcrl/\taoeuidhtns\n _qjkxbmwvz ";
-    assert_eq!(s.len(), res.keys.len());
-    for (i, c) in s.chars().enumerate() {
-        res.keys[i] = DispChar(u8::try_from(c).unwrap());
-    }
-    res
+    map!("~q,.pyfgcrl/~aoeuidhtns~~_qjkxbmwvz~")
 }
 
 pub fn isrt_reference() -> Layout<DispChar> {
-    let mut res = Layout {
-        keys: [DispChar(0); 36],
-    };
-    let s = "\u{8}yclmkzfu_, \tisrtgpneao\n qvwdjbh/.  ";
-    assert_eq!(s.len(), res.keys.len());
-    for (i, c) in s.chars().enumerate() {
-        res.keys[i] = DispChar(u8::try_from(c).unwrap());
-    }
-    res
+    map!("~yclmkzfu_,~~isrtgpneao~~qvwdjbh/.~~")
 }
 
 pub fn tlrs_reference() -> Layout<DispChar> {
@@ -221,13 +202,35 @@ pub fn tlrs_reference() -> Layout<DispChar> {
     T t l r s p   B S i e a N
     q , g d n k   ; h c x f z
     */
-    let mut res = Layout {
-        keys: [DispChar(0); 36],
-    };
-    let s = "\u{1b}wb/mvyuo_.j\ttlrsp\u{8} iea\nq,gdnk;hcxfz";
-    assert_eq!(s.len(), res.keys.len());
-    for (i, c) in s.chars().enumerate() {
-        res.keys[i] = DispChar(u8::try_from(c).unwrap());
-    }
-    res
+    //"\u{1b}wb/mvyuo_.j\ttlrsp\u{8} iea\nq,gdnk;hcxfz"
+    map!("~wb/mvyuo_.j~tlrsp~~iea~q,gdnk;hcxfz")
+}
+
+pub fn v9_reference() -> Layout<DispChar> {
+    /*
+        j u o / ; w   m k l _ v q
+        ( i e a t d   p n r s c )
+        y , . f g   b h x   z
+
+        l u o . q w   v k l m _
+        ( i e a t g   p n r s c )
+        y z / d f   b h x , j
+    */
+    map!("juo/lwmkl_vq(ieatdpnrsc)~y,.fgbhx~z~")
+}
+
+pub fn v10_reference() -> Layout<DispChar> {
+    // note: the program would say to swap 'd' and 'm', but
+    // the important 'd' would be in the worst place on a horizontally
+    // staggered keyboard
+    /*
+        j b f l w g   . ; / u h ~
+        z n t r s c   _ i e a o ~
+        q p v k d m   ( , y ) x ~
+    */
+    map!("jbflwg.;/uh~zntrsc_ieao~qpvkdm(.y)x~")
+}
+
+pub fn uciea_reference() -> Layout<DispChar> {
+    map!("~pyuo_kdhfxq~ciea/gtnsrv~z(,.;wmlbj)")
 }

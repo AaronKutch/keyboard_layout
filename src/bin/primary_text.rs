@@ -1,6 +1,6 @@
-use std::{fs, iter, path::PathBuf};
+use std::{fs, path::PathBuf};
 
-use common::{char_to_byte, std_primary_map, StarRng};
+use common::std_primary_map;
 
 const FILE: &str = "./text.txt";
 const OUT: &str = "./primary_layer_text.txt";
@@ -37,30 +37,5 @@ fn main() {
         }
     }
 
-    // add in backspaces and escapes, I think they should be this common considering
-    // writing code and escaping from shortcuts
-    let mut rng = StarRng::new(0);
-    let mut text2 = vec![];
-    let mut i = 0;
-    let mut next_backspace = 0;
-    //let mut next_escape = 0;
-    //let escape = char_to_byte('\u{1b}').unwrap();
-    let backspace = char_to_byte('\u{8}').unwrap();
-    loop {
-        if i >= text1.len() {
-            break
-        }
-        /*text2.push(text1[i]);
-        if i >= next_escape {
-            text2.push(escape);
-            next_escape = i + ((rng.next_u16() % 100) as usize);
-        }*/
-        if i >= next_backspace {
-            text2.extend(iter::repeat(backspace).take((rng.next_u16() % 10) as usize));
-            next_backspace = i + ((rng.next_u16() % 100) as usize);
-        }
-        i += 1;
-    }
-
-    fs::write(PathBuf::from(OUT.to_owned()), text2).unwrap();
+    fs::write(PathBuf::from(OUT.to_owned()), text1).unwrap();
 }

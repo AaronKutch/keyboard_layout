@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf};
 
 use common::{
     colemak_dh_reference, dvorak_reference, isrt_reference, movement_cost, qwerty_reference,
-    std_primary_map, tlrs_reference, DispChar, Layout,
+    std_primary_map, uciea_reference, v10_reference, v9_reference, DispChar, Layout,
 };
 
 const FILE: &str = "./test_english.txt";
@@ -41,7 +41,7 @@ fn main() {
     }
 
     // remove all the special characters since the other layouts weren't designed
-    // for them and the cost function heavily penalizes edge places
+    // for them
     text1.retain(|c| *c != b'\n');
     text1.retain(|c| *c != b'\t');
     text1.retain(|c| *c != b'.');
@@ -49,6 +49,8 @@ fn main() {
     text1.retain(|c| *c != b',');
     text1.retain(|c| *c != b';');
     text1.retain(|c| *c != b'_');
+    text1.retain(|c| *c != b'(');
+    text1.retain(|c| *c != b')');
 
     let cost_fn = |sample: &[u8], layout: &Layout<DispChar>| {
         let mut char_to_layout_inx: [u8; 256] = [0; 256];
@@ -60,13 +62,10 @@ fn main() {
         let mut v = vec![];
         for i in 0..sample.len() {
             if text[i] == b' ' {
-                // TODO
+                v.clear();
                 continue
             }
             let mapped = char_to_layout_inx[usize::from(text[i])];
-            if mapped == b' ' {
-                continue
-            }
             v.push(mapped);
             if v.len() > 3 {
                 v.remove(0);
@@ -96,8 +95,23 @@ fn main() {
     println!("ISRT: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 
-    let layout = tlrs_reference();
+    /*let layout = tlrs_reference();
     let cost = cost_fn(&text1, &layout);
-    println!("TLRS ,/b; _.: {}\n{}", cost, layout);
+    println!("TLRS: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));*/
+
+    let layout = v9_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("V9: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = v10_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("V10: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = uciea_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("Uciea: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 }
