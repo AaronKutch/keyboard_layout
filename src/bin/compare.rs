@@ -1,12 +1,9 @@
 use std::{fs, path::PathBuf};
 
-use common::{
-    colemak_dh_reference, dvorak_reference, isrt_reference, movement_cost, qwerty_reference,
-    std_primary_map, uciea_reference, v10_reference, v9_reference, DispChar, Layout,
-};
+use common::*;
 
-const FILE: &str = "./test_english.txt";
-//const FILE: &str = "./text.txt";
+//const FILE: &str = "./test_english.txt";
+const FILE: &str = "./text.txt";
 
 fn main() {
     let char_map = std_primary_map();
@@ -113,5 +110,10 @@ fn main() {
     let layout = uciea_reference();
     let cost = cost_fn(&text1, &layout);
     println!("Uciea: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = v11_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("V11: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 }

@@ -2,6 +2,19 @@ use std::{fs, path::PathBuf};
 
 use common::{movement_cost, v10_reference, DispChar, Layout};
 
+macro_rules! map {
+    ($s:expr) => {{
+        let mut res = Layout {
+            keys: [DispChar(0); 36],
+        };
+        assert_eq!($s.len(), res.keys.len());
+        for (i, c) in $s.chars().enumerate() {
+            res.keys[i] = DispChar(u8::try_from(c).unwrap());
+        }
+        res
+    }};
+}
+
 fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
@@ -30,7 +43,8 @@ fn main() {
         cost
     };
 
-    let mut best = v10_reference();
+    let mut best = map!("jbldvw.;/uh~qnrtsp_ieao~zmkgfc(,y)x~");
+    println!("{best}");
 
     loop {
         let unswapped_cost = cost_fn(&text, &best);
@@ -46,7 +60,7 @@ fn main() {
                 let cost = cost_fn(&text[..1000000], &trial_swap);
                 let mut reject = false;
                 if cost > unswapped_cost_trial {
-                    if (unswapped_cost_trial / (cost - unswapped_cost_trial)) <= 100 {
+                    if (unswapped_cost_trial / (cost - unswapped_cost_trial)) <= 500 {
                         reject = true;
                     }
                 }

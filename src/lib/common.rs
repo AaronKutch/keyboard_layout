@@ -234,3 +234,14 @@ pub fn v10_reference() -> Layout<DispChar> {
 pub fn uciea_reference() -> Layout<DispChar> {
     map!("~pyuo_kdhfxq~ciea/gtnsrv~z(,.;wmlbj)")
 }
+
+pub fn v11_reference() -> Layout<DispChar> {
+    // gets rid of annoying placement of top 10 chars,
+    // only adds the SP bigram and makes other things more elegant
+    /*
+        j b l d v w   . ; / u h ~
+        q n r t s p   _ i e a o ~
+        z m k g f c   ( , y ) x ~
+    */
+    map!("jbldvw.;/uh~qnrtsp_ieao~zmkgfc(,y)x~")
+}
