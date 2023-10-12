@@ -9,7 +9,7 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 23;
+    let rng_seed = 26;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
@@ -303,5 +303,9 @@ j b l d v w   . ; / u h ~
 q n r t s p   _ i e a o ~
 z m k g f c   ( , y ) x ~
 
+// the other column shift isn't as good
+z m c l v g   . ; / u h ~
+q n s r t p   _ i e a o ~
+j b w k d f   ( , y ) x ~
 
 */

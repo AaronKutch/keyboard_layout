@@ -151,6 +151,7 @@ pub fn delim_layer_chars() -> Vec<char> {
 
 */
 
+#[macro_export]
 macro_rules! map {
     ($s:expr) => {{
         let mut res = Layout {
