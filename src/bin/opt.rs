@@ -9,28 +9,34 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 26;
+    let rng_seed = 33;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-    /*
+
+    opt.freeze_key('j', 0);
+    opt.freeze_key('q', 12);
+    opt.freeze_key('z', 24);
     opt.freeze_key('b', 1);
-    opt.freeze_key('f', 2);
-    opt.freeze_key('l', 3);
-    opt.freeze_key('w', 4);
-    opt.freeze_key('g', 5);
+    opt.freeze_key('l', 2);
+    opt.freeze_key('d', 3);
+    opt.freeze_key('v', 4);
+    opt.freeze_key('w', 5);
     opt.freeze_key('n', 13);
-    opt.freeze_key('t', 14);
-    opt.freeze_key('r', 15);
+    opt.freeze_key('r', 14);
+    opt.freeze_key('t', 15);
     opt.freeze_key('s', 16);
-    opt.freeze_key('c', 17);
-    opt.freeze_key('p', 25);
-    opt.freeze_key('v', 26);
-    opt.freeze_key('k', 27);
-    opt.freeze_key('d', 28);
-    opt.freeze_key('m', 29);
-    */
-    opt.freeze_key('.', 6);
+    opt.freeze_key('p', 17);
+    opt.freeze_key('m', 25);
+    opt.freeze_key('k', 26);
+    opt.freeze_key('g', 27);
+    opt.freeze_key('f', 28);
+    opt.freeze_key('c', 29);
+
+    opt.freeze_key('_', 18);
+    opt.freeze_key('h', 19);
+    
+    /*opt.freeze_key('.', 6);
     opt.freeze_key(';', 7);
     opt.freeze_key('/', 8);
     opt.freeze_key('u', 9);
@@ -44,7 +50,7 @@ fn main() {
     opt.freeze_key(',', 31);
     opt.freeze_key('y', 32);
     opt.freeze_key(')', 33);
-    opt.freeze_key('x', 34);
+    opt.freeze_key('x', 34);*/
 
     // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {
@@ -133,6 +139,9 @@ fn main() {
         let mut best_swaps = vec![];
         for i in 0..36 {
             for j in 0..i {
+                if opt.frozen.keys[i] || opt.frozen.keys[j] {
+                    continue
+                }
                 let mut trial_swap = best.clone();
                 trial_swap.keys.swap(i, j);
                 let cost_diff = unswapped_cost.saturating_sub(cost_fn(&sample_starts, &trial_swap));

@@ -30,8 +30,10 @@ fn main() {
         cost
     };
 
-    let mut best = map!("jbldvw.;/uh~qnrtsp_ieao~zmkgfc(,y)x~");
+    let mut best = map!("jbldvw.;uo/Zqnrtsp_hiaeZzmkgfc(,x)yZ");
     println!("{best}");
+
+    let frozen = Layout::<bool>::new(|_| false);
 
     loop {
         let unswapped_cost = cost_fn(&text, &best);
@@ -40,6 +42,9 @@ fn main() {
         for i in 0..36 {
             dbg!(i);
             for j in 0..i {
+                if frozen.keys[i] || frozen.keys[j] {
+                    continue
+                }
                 let mut trial_swap = best.clone();
                 trial_swap.keys.swap(i, j);
                 // trial swap on a million to reject if the difference was only slightly

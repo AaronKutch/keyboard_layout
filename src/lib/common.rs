@@ -246,3 +246,16 @@ pub fn v11_reference() -> Layout<DispChar> {
     */
     map!("jbldvw.;/uh~qnrtsp_ieao~zmkgfc(,y)x~")
 }
+
+pub fn v12_reference() -> Layout<DispChar> {
+    // based on manual feedback, the cost function did not punish sfbs quite enough,
+    // I froze the h key, then mirroring the result matches
+    // https://github.com/rdavison/graphite-layout and makes the top sfbs SP with
+    // only 0.158% frequency, at the cost of only 1% vs my cost function
+    /*
+        j b l d v w   . ; o u / ~
+        q n r t s p   _ h a e i ~
+        z m k g f c   ( , x ) y ~
+    */
+    map!("jbldvw.;ou/~qnrtsp_haei~zmkgfc(,x)y~")
+}

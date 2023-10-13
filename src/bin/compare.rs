@@ -117,8 +117,8 @@ fn main() {
     println!("V11: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 
-    let layout = map!("zmclvg.;/uh~qnsrtp_ieao~jbwkdf(,y)x~");
+    let layout = v12_reference();
     let cost = cost_fn(&text1, &layout);
-    println!("nsrt: {}\n{}", cost, layout);
+    println!("V12: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 }
