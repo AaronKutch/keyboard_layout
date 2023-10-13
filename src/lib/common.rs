@@ -253,9 +253,9 @@ pub fn v12_reference() -> Layout<DispChar> {
     // https://github.com/rdavison/graphite-layout and makes the top sfbs SP with
     // only 0.158% frequency, at the cost of only 1% vs my cost function
     /*
-        j b l d v w   . ; o u / ~
-        q n r t s p   _ h a e i ~
-        z m k g f c   ( , x ) y ~
+        j b l d v w   . ; o u y ~
+        q n r t s p   ( h a e i ~
+        z m k g f c   _ , x ) / ~
     */
-    map!("jbldvw.;ou/~qnrtsp_haei~zmkgfc(,x)y~")
+    map!("jbldvw.;ouy~qnrtsp(haei~zmkgfc_,x)/~")
 }

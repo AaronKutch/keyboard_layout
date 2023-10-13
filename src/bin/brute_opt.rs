@@ -30,10 +30,11 @@ fn main() {
         cost
     };
 
-    let mut best = map!("jbldvw.;uo/Zqnrtsp_hiaeZzmkgfc(,x)yZ");
+    let mut best = map!("jbldvw.;uoyZqnrtsp(hiaeZzmkgfc_,x)/Z");
     println!("{best}");
 
-    let frozen = Layout::<bool>::new(|_| false);
+    let mut frozen = Layout::<bool>::new(|_| false);
+    frozen.keys[19] = true;
 
     loop {
         let unswapped_cost = cost_fn(&text, &best);

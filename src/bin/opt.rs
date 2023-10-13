@@ -13,7 +13,7 @@ fn main() {
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
-
+    // manual freezes to independently fuzz both sides
     opt.freeze_key('j', 0);
     opt.freeze_key('q', 12);
     opt.freeze_key('z', 24);
@@ -33,9 +33,9 @@ fn main() {
     opt.freeze_key('f', 28);
     opt.freeze_key('c', 29);
 
-    opt.freeze_key('_', 18);
+    //opt.freeze_key('_', 18);
     opt.freeze_key('h', 19);
-    
+
     /*opt.freeze_key('.', 6);
     opt.freeze_key(';', 7);
     opt.freeze_key('/', 8);
