@@ -4,6 +4,8 @@ https://www.reddit.com/r/KeyboardLayouts/comments/176nm6u/i_made_a_program_to_fi
 
 The board I found likes to converge on the general layout of https://github.com/rdavison/graphite-layout. Note that my cost function has issues with sfbs, I had to manually freeze some keys and mirror the vowels.
 
+This is designed for a 42 key ortholinear keyboard with a little column stagger.
+
 Edit 10/25/2023:
 After some real world experience and adjustments, I have settled on
 ```
@@ -16,7 +18,7 @@ where the parenthesis could be replaced if they are not as important to you (not
 
 The other layers are a design space that needs tuning. My current idea is that holding one or the other modifier or both leads to activating one of three other layers. Releasing goes back to the previous layer, so that every layer is the quickest movement away from each other layer.
 
-M1 activates
+M1 activates the numbers layer
 ```
  OS  @ # ? ! %   0 7 8 9 0  Alt
 Esc  v < ^ > =   0 4 5 6 0  Enter
@@ -25,20 +27,20 @@ Esc  v < ^ > =   0 4 5 6 0  Enter
 ```
 where "v < ^ >" are the arrow keys and the bottom right '>' is there for the common "->" sequence in Rust. Some of the zeros may be replaced. When holding down M0 with a thumb, your other four fingers are immediately in position to move with the arrow keys. The downwards arrow being on the pinky instead of a WASD-like arrangement takes some getting used to, but I think it is a strictly superior way that avoids up-down alternation cases. At the same time as you have arbitrary movement, your right hand is free to do any hold modifier, which is extremely useful when selecting text without switching to a mouse.
 
-M2 activates
+M2 activates the delimiters layer
 ```
- OS    ~ ` \       | & ^    Alt
-Esc  < > ( )       [ ] { }  Enter
-           '       "        Ctrl
+ OS    ^ &         ' " ` ~  Alt
+Esc  < > ( ) \   | [ ] { }  Enter
+     v < ^ >                Ctrl
   Tab Space M3   [] Shift BackSpace
 ```
+where "v < ^ >" are the arrow keys again
 
-M1 + M2 activates
+M1 + M2 activates the function layer
 ```
-F1   F2     F3       F4   F5  F6         F7      F8     F9  F10 F11 F12
-Esc  PageUp PageDown Home End CapsLock   NumLock Insert Delete ? ?  Alt
-?   Ctrl+Z Ctrl+X Ctrl+C Ctrl+V Ctrl+F   ? ? ? ? ? Ctrl
+F1   F2     F3       F4   F5  F6         F7      F8     F9  F10 F11  F12
+Esc  PageUp PageDown Home End CapsLock   NumLock Insert Delete T? T? Alt
+Ctrl+Y Ctrl+Z ..+X  ..+C  ..+V  ..+F                                Ctrl
                           Tab Space []   [] Shift BackSpace
 ```
-
-If there is a need for more specialized layers, toggling modifiers could be put on the third layer.
+If there is a need for more specialized layers, toggling modifiers could be put on the function layer.
