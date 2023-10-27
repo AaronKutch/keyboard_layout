@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use common::{movement_cost, DispChar, Layout, map};
+use common::{map, movement_cost, DispChar, Layout};
 
 fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
@@ -30,7 +30,7 @@ fn main() {
         cost
     };
 
-    let mut best = map!("jbldvw.;uoyZqnrtsp(hiaeZzmkgfc_,x)/Z");
+    let mut best = map!("jbldvw.)uoy~qnrtsp(ieah~zmkgfc_,;x/~");
     println!("{best}");
 
     let mut frozen = Layout::<bool>::new(|_| false);

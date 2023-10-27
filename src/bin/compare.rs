@@ -2,8 +2,8 @@ use std::{fs, path::PathBuf};
 
 use common::*;
 
-//const FILE: &str = "./test_english.txt";
-const FILE: &str = "./text.txt";
+const FILE: &str = "./test_english.txt";
+//const FILE: &str = "./text.txt";
 
 fn main() {
     let char_map = std_primary_map();
@@ -120,5 +120,10 @@ fn main() {
     let layout = v12_reference();
     let cost = cost_fn(&text1, &layout);
     println!("V12: {}\n{}", cost, layout);
+    println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
+
+    let layout = v13_reference();
+    let cost = cost_fn(&text1, &layout);
+    println!("V13: {}\n{}", cost, layout);
     println!("improvement over qwerty: {}\n", qwerty_cost / (cost as f64));
 }

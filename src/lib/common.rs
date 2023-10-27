@@ -259,3 +259,21 @@ pub fn v12_reference() -> Layout<DispChar> {
     */
     map!("jbldvw.;ouy~qnrtsp(haei~zmkgfc_,x)/~")
 }
+
+pub fn v13_reference() -> Layout<DispChar> {
+    // I found after more practice that I didn't like the way
+    // that the right side tended to roll outwards and had
+    // 'i' on the pinky. This arrangement makes "you" and
+    // many 'h' starters much easier to roll. The pinky
+    // usage is reduced according to online analyzers.
+    // Changing rolling to be more highly preferred makes this
+    // have almost the same perf as v10 on English text. The only common bad
+    // transistion is the h -> o transistion, which means that the pinky stagger
+    // should not be too high.
+    /*
+        j b l d v w   . ) u o y ~
+        q n r t s p   ( i e a h ~
+        z m k g f c   _ , ; x / ~
+    */
+    map!("jbldvw.)uoy~qnrtsp(ieah~zmkgfc_,;x/~")
+}
