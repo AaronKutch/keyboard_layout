@@ -277,3 +277,14 @@ pub fn v13_reference() -> Layout<DispChar> {
     */
     map!("jbldvw.)uoy~qnrtsp(ieah~zmkgfc_,;x/~")
 }
+
+pub fn v14_reference() -> Layout<DispChar> {
+    // I did not like the placement of 'C' and the SP bigram, this actually recovers
+    // the cyanophage performance of graphite
+    /*
+        j b l d v w   ( ) u o y ~
+        q n r t s f   ; i e a h ~
+        z m k g c x   _ p , . / ~
+    */
+    map!("jbldvw()uoy~qnrtsf;ieah~zmkgcx_p,./~")
+}

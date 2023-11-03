@@ -9,48 +9,37 @@ fn main() {
     let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
-    let rng_seed = 33;
+    let rng_seed = 34;
     let mut rng = StarRng::new(rng_seed);
     let mut opt = RampOptimize::new(rng_seed + 1, population, |_| rand_layout(&mut rng)).unwrap();
 
     // manual freezes to independently fuzz both sides
-    opt.freeze_key('j', 0);
+    /*opt.freeze_key('j', 0);
     opt.freeze_key('q', 12);
     opt.freeze_key('z', 24);
-    opt.freeze_key('b', 1);
+    opt.freeze_key('b', 1);*/
     opt.freeze_key('l', 2);
     opt.freeze_key('d', 3);
-    opt.freeze_key('v', 4);
-    opt.freeze_key('w', 5);
+    /*opt.freeze_key('v', 4);
+    opt.freeze_key('w', 5);*/
     opt.freeze_key('n', 13);
     opt.freeze_key('r', 14);
     opt.freeze_key('t', 15);
     opt.freeze_key('s', 16);
-    opt.freeze_key('p', 17);
+    /*opt.freeze_key('p', 17);
     opt.freeze_key('m', 25);
     opt.freeze_key('k', 26);
     opt.freeze_key('g', 27);
     opt.freeze_key('f', 28);
-    opt.freeze_key('c', 29);
+    opt.freeze_key('c', 29);*/
 
-    //opt.freeze_key('_', 18);
-    opt.freeze_key('h', 19);
-
-    /*opt.freeze_key('.', 6);
-    opt.freeze_key(';', 7);
-    opt.freeze_key('/', 8);
-    opt.freeze_key('u', 9);
-    opt.freeze_key('h', 10);
-    opt.freeze_key('_', 18);
+    opt.freeze_key('u', 8);
+    opt.freeze_key('o', 9);
+    opt.freeze_key('y', 10);
     opt.freeze_key('i', 19);
-    opt.freeze_key('e', 20);
-    opt.freeze_key('a', 21);
-    opt.freeze_key('o', 22);
-    opt.freeze_key('(', 30);
-    opt.freeze_key(',', 31);
-    opt.freeze_key('y', 32);
-    opt.freeze_key(')', 33);
-    opt.freeze_key('x', 34);*/
+    opt.freeze_key('e', 19);
+    opt.freeze_key('a', 19);
+    opt.freeze_key('h', 19);
 
     // `samples` makes it so the same samples are applied to all
     let cost_fn = |samples: &[usize], layout: &Layout<DispChar>| {

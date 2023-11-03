@@ -30,7 +30,7 @@ fn main() {
         cost
     };
 
-    let mut best = map!("jbldvw.)uoy~qnrtsp(ieah~zmkgfc_,;x/~");
+    let mut best = map!("jbldvw.)uoy~qnrtsf(ieah~zmkgcx_p,;/~");
     println!("{best}");
 
     let mut frozen = Layout::<bool>::new(|_| false);

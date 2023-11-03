@@ -124,7 +124,10 @@ pub fn movement_cost(older_to_newer: &[u8]) -> u64 {
             // two below index finger, 4 above middle and ring fingers
             28 | 31 | 2 | 3 | 8 | 9 => 150,
             // get stuff away from the pinkies
-            0 | 11 | 12 | 23 | 24 | 35 => 400,
+            12 | 23 => 350,
+            0 | 11 | 24 | 35 => 400,
+            // corners are annoying
+            5 | 6 | 29 | 30 => 300,
             // not too high, other rules are more important
             _ => 200,
         };
