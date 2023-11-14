@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf};
 use common::{map, movement_cost, DispChar, Layout};
 
 fn main() {
-    let text = fs::read_to_string(PathBuf::from("./text.txt".to_owned())).unwrap();
+    let text = fs::read_to_string(PathBuf::from("./test_english.txt".to_owned())).unwrap();
     let text = text.as_bytes();
 
     // `samples` makes it so the same samples are applied to all
@@ -30,10 +30,11 @@ fn main() {
         cost
     };
 
-    let mut best = map!("jbldvw.)uoy~qnrtsf(ieah~zmkgcx_p,;/~");
+    let mut best = map!("jvldbw.)uoy~qnrtsf(ieah~zmkgcx_p,;/~");
     println!("{best}");
 
     let mut frozen = Layout::<bool>::new(|_| false);
+    frozen.keys[14] = true;
     frozen.keys[19] = true;
 
     loop {

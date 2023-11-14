@@ -278,7 +278,7 @@ pub fn v13_reference() -> Layout<DispChar> {
     map!("jbldvw.)uoy~qnrtsp(ieah~zmkgfc_,;x/~")
 }
 
-pub fn v14_reference() -> Layout<DispChar> {
+pub fn v14_old_reference() -> Layout<DispChar> {
     // I did not like the placement of 'C' and the SP bigram, this actually recovers
     // the cyanophage performance of graphite
     /*
@@ -287,4 +287,15 @@ pub fn v14_reference() -> Layout<DispChar> {
         z m k g c x   _ p , . / ~
     */
     map!("jbldvw()uoy~qnrtsf;ieah~zmkgcx_p,./~")
+}
+
+pub fn v14_reference() -> Layout<DispChar> {
+    // there was too much action on the left pinky, and m <-> b was noticeably
+    // annoying even though it should be rare, so I swapped v and b
+    /*
+        j v l d b w   ( ) u o y ~
+        q n r t s f   ; i e a h ~
+        z m k g c x   _ p , . / ~
+    */
+    map!("jvldbw()uoy~qnrtsf;ieah~zmkgcx_p,./~")
 }

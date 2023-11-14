@@ -2,18 +2,19 @@ Keyboard layout finder and optimizer
 
 https://www.reddit.com/r/KeyboardLayouts/comments/176nm6u/i_made_a_program_to_find_a_new_class_of/
 
-This is designed for a ~42 key ortholinear keyboard with a little column stagger. I use light 20gf key switches for all keys except for the 6 index, middle, and ring finger home keys.
+This is designed for a ~42 key ortholinear keyboard with a little column stagger. I use light 20gf key switches for all keys except for the 4 index and middle finger home keys.
 
-Edit 11/3/2023:
+Edit 11/14/2023:
 After some real world experience and adjustments, I have settled on
 ```
-J  B L D V W   ? ? U O Y  Alt
+J  V L D B W   - ' U O Y  Alt
 Q  N R T S F   ; I E A H  Enter
-Z  M K G C X   ? P , . /  Ctrl
+Z  M K G C X   \ P , . /  Ctrl
 Tab Space M1   M2 Shift BackSpace
 ```
-where the `?` spots can be customized according to common special keys for your workflow. The top right `?` could be the QMK repeat key, but in programming I find it to be rarely be used and instead use `'`, `_`, and `:` for the special spots, in order.
-The bottom row goes on the thumb keys. For boards where there are only two thumb keys on each side, the tab and backspace can be moved to `?` spots, leaving the space, shift, and two modifiers. For boards without the extra pinky columns, just J, Q, Z, and the usual modifiers need to be rehomed, which could be put on the `?` spots (put Q on the upper right `?`) or be done as chords on the corners like MK, VW, CX, upper left "??", and "?P" which are rare.
+where the '-', "'", and "\" keys may be modified depending on which special keys are most common for
+you (for programming I switch them to "'", '_', and ':').
+The bottom row goes on the thumb keys. For boards where there are only two thumb keys on each side, the tab and backspace can be moved to special key spots, leaving the space, shift, and two modifiers. For boards without the extra pinky columns, just J, Q, Z, and the usual modifiers need to be rehomed, which could be put on the special key spots or be done as chords on the corners that are rare.
 
 The main feature of this layout is that the top 14 letters are all in the
 formation
@@ -38,12 +39,15 @@ where "v < ^ >" are the arrow keys and the top `?` is the actual `?` char. Some 
 
 M2 activates the delimiters layer
 ```
- OS    ^ &         ' " ` ~  Alt
+ OS    ^ &       & ' " ` ~  Alt
 Esc  { } [ ] \   | ( ) < >  Enter
-  ?  v < ^ >                Ctrl
+  ?  v < ^ >     F V C X Z  Ctrl
   Tab Space M3   [] Shift BackSpace
 ```
-where "v < ^ >" are the arrow keys again
+where "v < ^ >" are the arrow keys again, and the bottom row "F V C X Z" have the Ctrl
+modifier applied to them. I am left handed and use this side to be able to use the mouse
+at the same time as some of these duplicated symbols, so this layer and others may be
+mirrored.
 
 M1 + M2 activates the function layer
 ```
