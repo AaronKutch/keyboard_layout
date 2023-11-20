@@ -13,7 +13,7 @@ Z  M K G C X   \ P , . /  Ctrl
 Tab Space M1   M2 Shift BackSpace
 ```
 where the '-', "'", and "\" keys may be modified depending on which special keys are most common for
-you (for programming I switch them to "'", '_', and ':').
+you (for programming I switch them to "'", '_', and ':' respectively).
 The bottom row goes on the thumb keys. For boards where there are only two thumb keys on each side, the tab and backspace can be moved to special key spots, leaving the space, shift, and two modifiers. For boards without the extra pinky columns, just J, Q, Z, and the usual modifiers need to be rehomed, which could be put on the special key spots or be done as chords on the corners that are rare.
 
 The main feature of this layout is that the top 14 letters are all in the
@@ -30,18 +30,18 @@ The other layers are a design space that needs tuning. My current idea is that h
 
 M1 activates the numbers layer
 ```
- OS  @ # ? ! %   0 7 8 9 0  Alt
-Esc  v < ^ > =   0 4 5 6 0  Enter
-  ?  / * - + $   0 1 2 3 0  Ctrl
+ OS   $ 8 9 % :   ( 4 5 6 7  Alt
+Esc   v < ^ > =   ) 0 1 2 3  Enter
+Space ^ * - + |   & ! , . /  Ctrl
   Tab Space []   M3 Shift BackSpace
 ```
 where "v < ^ >" are the arrow keys and the top `?` is the actual `?` char. Some of the zeros may be replaced. When holding down M0 with a thumb, your other four fingers are immediately in position to move with the arrow keys. The downwards arrow being on the pinky instead of a WASD-like arrangement takes some getting used to, but I think it is a strictly superior way that avoids up-down alternation cases. At the same time as you have arbitrary movement, your right hand is free to do any hold modifier, which is extremely useful when selecting text without switching to a mouse.
 
 M2 activates the delimiters layer
 ```
- OS    ^ &       & ' " ` ~  Alt
-Esc  { } [ ] \   | ( ) < >  Enter
-  ?  v < ^ >     F V C X Z  Ctrl
+ OS   $ @ # & *   - ' " ` ~  Alt
+Esc   { } [ ] \   | ( ) < >  Enter
+Space v < ^ >     F V C X Z  Ctrl
   Tab Space M3   [] Shift BackSpace
 ```
 where "v < ^ >" are the arrow keys again, and the bottom row "F V C X Z" have the Ctrl
@@ -53,7 +53,7 @@ M1 + M2 activates the function layer
 ```
 F1   F2     F3       F4   F5  F6         F7      F8     F9  F10 F11  F12
 Esc  PageUp PageDown Home End CapsLock   NumLock Insert Delete T? T? Alt
-Ctrl+Y Ctrl+Z ..+X  ..+C  ..+V  ..+F                                Ctrl
+Y    Z      X        C    V   F                                      Ctrl
                           Tab Space []   [] Shift BackSpace
 ```
 If there is a need for more specialized layers, toggling modifiers could be put on the function layer.
