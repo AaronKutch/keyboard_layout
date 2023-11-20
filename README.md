@@ -30,8 +30,8 @@ The other layers are a design space that needs tuning. My current idea is that h
 
 M1 activates the numbers layer
 ```
- OS   $ 8 9 % :   ( 4 5 6 7  Alt
-Esc   v < ^ > =   ) 0 1 2 3  Enter
+ OS   $ 8 9 % :   ) 4 5 6 7  Alt
+Esc   v < ^ > =   ( 0 1 2 3  Enter
 Space ^ * - + |   & ! , . /  Ctrl
   Tab Space []   M3 Shift BackSpace
 ```
